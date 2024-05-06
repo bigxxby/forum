@@ -27,10 +27,10 @@ func (m *Manager) POST_SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := struct {
-		Login           string `json:"login" binding:"required"`
-		Email           string `json:"email" binding:"required"`
-		Password        string `json:"password" binding:"required"`
-		ConfirmPassword string `json:"confirmPassword" binding:"required"`
+		Login           string `json:"login" required:"true"`
+		Email           string `json:"email" required:"true"`
+		Password        string `json:"password" required:"true"`
+		ConfirmPassword string `json:"confirmPassword" required:"true"`
 	}{}
 	err = json.Unmarshal(body, &data)
 	if err != nil {
@@ -71,6 +71,10 @@ func (m *Manager) POST_SignUp(w http.ResponseWriter, r *http.Request) {
 	//////////////////////VALIDATION
 	err = m.UserRepo.CreateUser(uuid, data.Login, hash, data.Email)
 	if err != nil {
+		if err.Error() == "user elready exists" {
+			httpHelper.ConflictError(w)
+			return
+		}
 		log.Println(err.Error())
 		httpHelper.InternalServerError(w)
 		return

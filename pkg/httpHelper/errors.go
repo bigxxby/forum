@@ -33,3 +33,9 @@ func BadRequestError(w http.ResponseWriter) {
 		Message: "Bad request, buddy :P",
 	})
 }
+
+func ConflictError(w http.ResponseWriter) {
+	WriteJson(w, http.StatusConflict, models.DefaultMessage{
+		Message: "CONFLICT!!! use other data pls :o",
+	})
+}
