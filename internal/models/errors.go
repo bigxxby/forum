@@ -6,4 +6,5 @@ var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrInternalServer     = errors.New("internal server error")
 	ErrConflict           = errors.New("conflict")
+	ErrBadRequest         = errors.New("bad request")
 )

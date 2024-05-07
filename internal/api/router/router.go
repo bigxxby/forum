@@ -3,21 +3,42 @@ package router
 import (
 	"database/sql"
 	"forum/internal/api/controllers"
+	postController "forum/internal/api/controllers/post"
+	userController "forum/internal/api/controllers/user"
+	"forum/internal/api/middlewares"
 	"forum/internal/repository"
+	"forum/internal/repository/post"
+	userRepository "forum/internal/repository/user"
 	"forum/internal/service"
+	postService "forum/internal/service/post"
+	userService "forum/internal/service/user"
 	"log"
 	"net/http"
 )
 
 type Router struct {
-	UserController *controllers.UserController
+	UserController *userController.UserController
 	HTMLController *controllers.HTMLController
+	PostController *postController.PostController
 }
 
 func NewRouter(connection *sql.DB) *Router {
+	userRepo := userRepository.NewUserRepository(connection)
+	userServ := userService.NewUserService(userRepo)
+	userCtrl := userController.NewUserController(userServ)
+
+	htmlRepo := repository.NewHTMLRepo(connection)
+	htmlServ := service.NewHTMLService(htmlRepo)
+	htmlCtrl := controllers.NewHTMLController(htmlServ)
+
+	postRepo := post.NewPostRepository(connection)
+	postServ := postService.NewPostService(postRepo)
+	postCtrl := postController.NewPostController(postServ, userServ)
+
 	return &Router{
-		UserController: controllers.NewUserController(service.NewUserService(repository.NewUserRepository(connection))),
-		HTMLController: controllers.NewHTMLController(*service.NewHTMLService(repository.NewHTMLRepo(connection))),
+		UserController: userCtrl,
+		HTMLController: htmlCtrl,
+		PostController: postCtrl,
 	}
 }
 
@@ -38,7 +59,11 @@ func Run() {
 		return
 	}
 	router := NewRouter(connection)
-
+	err = router.UserController.UserService.CreateAdmin()
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
 	http.HandleFunc("/", router.HTMLController.GET_HTML_Index)
 	http.HandleFunc("/signUp", router.HTMLController.GET_HTML_SignUp)
 	http.HandleFunc("/signIn", router.HTMLController.GET_HTML_SignIn)
@@ -46,6 +71,8 @@ func Run() {
 	http.HandleFunc("/api/users/taken", router.UserController.GET_CheckIfLoginIsTaken)
 	http.HandleFunc("/api/signUp", router.UserController.POST_SignUp)
 	http.HandleFunc("/api/signIn", router.UserController.POST_SignIn)
+
+	http.HandleFunc("/api/posts/", middlewares.AuthMiddleware(router.PostController.POST_PostPost, router.UserController.UserService))
 
 	staticDir := "/static/"
 	staticFileServer := http.StripPrefix(staticDir, http.FileServer(http.Dir("web/ui/static")))

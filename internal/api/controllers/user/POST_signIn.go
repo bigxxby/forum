@@ -1,4 +1,4 @@
-package controllers
+package user
 
 import (
 	"database/sql"
@@ -49,8 +49,15 @@ func (m *UserController) POST_SignIn(w http.ResponseWriter, r *http.Request) {
 			httpHelper.InternalServerError(w)
 			return
 		}
-
 	}
+	COCK := &http.Cookie{
+		Name:     "uuid",
+		Value:    uuid,
+		Path:     "/",
+		MaxAge:   3600,
+		HttpOnly: true,
+	}
+	http.SetCookie(w, COCK)
 
 	httpHelper.WriteJson(w, http.StatusOK, models.AuthenticationMessage{
 		Message: "Congratz, authorised :)",

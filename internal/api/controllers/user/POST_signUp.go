@@ -1,4 +1,4 @@
-package controllers
+package user
 
 import (
 	"encoding/json"
@@ -26,14 +26,14 @@ func (m *UserController) POST_SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := struct {
-		Login           string `json:"login" required:"true"`
-		Email           string `json:"email" required:"true"`
-		Password        string `json:"password" required:"true"`
-		ConfirmPassword string `json:"confirmPassword" required:"true"`
+		Login           string `json:"login"`
+		Email           string `json:"email"`
+		Password        string `json:"password"`
+		ConfirmPassword string `json:"confirmPassword"`
 	}{}
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		httpHelper.InternalServerError(w)
+		httpHelper.BadRequestError(w)
 		return
 	}
 
@@ -70,29 +70,5 @@ func (m *UserController) POST_SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 	httpHelper.WriteJson(w, http.StatusOK, models.DefaultMessage{
 		Message: "User registered :)",
-	})
-}
-func (c *UserController) GET_CheckIfLoginIsTaken(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		httpHelper.MethodNotAllowedError(w)
-		return
-	}
-	if r.URL.Path != "/api/users/taken" {
-		httpHelper.NotFoundError(w)
-		return
-	}
-	login := r.URL.Query().Get("login")
-	if login == "" {
-		httpHelper.BadRequestError(w)
-		return
-	}
-
-	err := c.UserService.CheckLoginAvailable(login)
-	if err != nil {
-		httpHelper.ConflictError(w)
-		return
-	}
-	httpHelper.WriteJson(w, 200, models.DefaultMessage{
-		Message: "Login is free :)",
 	})
 }

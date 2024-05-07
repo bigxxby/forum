@@ -10,9 +10,9 @@ type HTMLController struct {
 	HTMLService *service.HTMLService
 }
 
-func NewHTMLController(service service.HTMLService) *HTMLController {
+func NewHTMLController(service *service.HTMLService) *HTMLController {
 	return &HTMLController{
-		HTMLService: &service,
+		HTMLService: service,
 	}
 }
 
