@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-func (m *Manager) POST_SignIn(w http.ResponseWriter, r *http.Request) {
+func (m *UserController) POST_SignIn(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		httpHelper.MethodNotAllowedError(w)
 		return
@@ -30,7 +30,7 @@ func (m *Manager) POST_SignIn(w http.ResponseWriter, r *http.Request) {
 	}{}
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		httpHelper.InternalServerError(w)
+		httpHelper.BadRequestError(w)
 		return
 	}
 	//////////////////////VALIDATION
@@ -39,15 +39,17 @@ func (m *Manager) POST_SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//////////////////////VALIDATION
-	uuid, err := m.UserRepo.AuthUser(data.Email, data.Password)
+	uuid, err := m.UserService.AuthUser(data.Email, data.Password)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			httpHelper.NotFoundError(w)
+		if err == sql.ErrNoRows || err == models.ErrInvalidCredentials {
+			httpHelper.Unauthorised(w)
+			return
+		} else {
+			log.Println(err.Error())
+			httpHelper.InternalServerError(w)
 			return
 		}
-		log.Println(err.Error())
-		httpHelper.InternalServerError(w)
-		return
+
 	}
 
 	httpHelper.WriteJson(w, http.StatusOK, models.AuthenticationMessage{

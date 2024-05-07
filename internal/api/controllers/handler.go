@@ -1,21 +1,15 @@
 package controllers
 
 import (
-	"forum/internal/database"
-	"forum/internal/database/repos"
+	"forum/internal/service"
 )
 
-type Manager struct {
-	Database *database.Database
-	UserRepo *repos.UserRepo
+type UserController struct {
+	UserService *service.UserService
 }
 
-func NewManager(Database database.Database) (*Manager, error) {
-	userRepo := repos.NewUserRepo(Database.DB)
-	manager := Manager{
-		Database: &Database,
-		UserRepo: userRepo,
+func NewUserController(service *service.UserService) *UserController {
+	return &UserController{
+		UserService: service,
 	}
-
-	return &manager, nil
 }

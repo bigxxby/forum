@@ -1,13 +1,9 @@
-package database
+package repository
 
 import (
 	"database/sql"
 	"os"
 )
-
-type Database struct {
-	DB *sql.DB
-}
 
 func Migrate(db *sql.DB) error {
 	err := tables(db)

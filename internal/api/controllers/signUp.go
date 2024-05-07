@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"forum/internal/models"
-	"forum/pkg/crypto"
 	"forum/pkg/httpHelper"
 	"forum/pkg/validation"
 	"io"
@@ -12,7 +11,7 @@ import (
 	"net/mail"
 )
 
-func (m *Manager) POST_SignUp(w http.ResponseWriter, r *http.Request) {
+func (m *UserController) POST_SignUp(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		httpHelper.MethodNotAllowedError(w)
 		return
@@ -47,18 +46,6 @@ func (m *Manager) POST_SignUp(w http.ResponseWriter, r *http.Request) {
 		httpHelper.BadRequestError(w)
 		return
 	}
-	uuid, err := crypto.CreateUUID()
-	if err != nil {
-		log.Println(err.Error())
-		httpHelper.InternalServerError(w)
-		return
-	}
-	hash, err := crypto.GenerateHash(data.Password)
-	if err != nil {
-		log.Println(err.Error())
-		httpHelper.InternalServerError(w)
-		return
-	}
 	_, err = mail.ParseAddress(data.Email)
 	if err != nil {
 		httpHelper.BadRequestError(w)
@@ -69,17 +56,43 @@ func (m *Manager) POST_SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//////////////////////VALIDATION
-	err = m.UserRepo.CreateUser(uuid, data.Login, hash, data.Email)
+	err = m.UserService.RegisterUser(data.Login, data.Email, data.Password)
 	if err != nil {
-		if err.Error() == "user elready exists" {
+		switch err {
+		case models.ErrConflict:
 			httpHelper.ConflictError(w)
 			return
+		default:
+			log.Println(err.Error())
+			httpHelper.InternalServerError(w)
+			return
 		}
-		log.Println(err.Error())
-		httpHelper.InternalServerError(w)
-		return
 	}
 	httpHelper.WriteJson(w, http.StatusOK, models.DefaultMessage{
 		Message: "User registered :)",
+	})
+}
+func (c *UserController) GET_CheckIfLoginIsTaken(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		httpHelper.MethodNotAllowedError(w)
+		return
+	}
+	if r.URL.Path != "/api/users/taken" {
+		httpHelper.NotFoundError(w)
+		return
+	}
+	login := r.URL.Query().Get("login")
+	if login == "" {
+		httpHelper.BadRequestError(w)
+		return
+	}
+
+	err := c.UserService.CheckLoginAvailable(login)
+	if err != nil {
+		httpHelper.ConflictError(w)
+		return
+	}
+	httpHelper.WriteJson(w, 200, models.DefaultMessage{
+		Message: "Login is free :)",
 	})
 }
