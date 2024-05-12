@@ -28,7 +28,7 @@ func Drop(db *sql.DB) error {
 	return nil
 }
 func tables(db *sql.DB) error {
-	migrationSQL, err := os.ReadFile("migrations/users.sql")
+	migrationSQL, err := os.ReadFile("migrations/tables.sql")
 	if err != nil {
 
 		return err
@@ -40,7 +40,7 @@ func tables(db *sql.DB) error {
 	return nil
 }
 func data(db *sql.DB) error {
-	migrationSQL, err := os.ReadFile("migrations/data.sql")
+	migrationSQL, err := os.ReadFile("migrations/mock.sql")
 	if err != nil {
 
 		return err

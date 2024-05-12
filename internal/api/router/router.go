@@ -73,6 +73,7 @@ func Run() {
 	http.HandleFunc("/api/signIn", router.UserController.POST_SignIn)
 
 	http.HandleFunc("/api/posts", middlewares.AuthMiddleware(router.PostController.POST_PostPost, router.UserController.UserService))
+	http.HandleFunc("/api/posts/", router.PostController.GET_post)
 
 	staticDir := "/static/"
 	staticFileServer := http.StripPrefix(staticDir, http.FileServer(http.Dir("web/ui/static")))
