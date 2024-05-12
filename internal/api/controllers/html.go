@@ -1,18 +1,18 @@
 package controllers
 
 import (
-	"forum/internal/service"
+	"database/sql"
 	"forum/pkg/httpHelper"
 	"net/http"
 )
 
 type HTMLController struct {
-	HTMLService *service.HTMLService
+	DB *sql.DB
 }
 
-func NewHTMLController(service *service.HTMLService) *HTMLController {
+func NewHTMLController(connection *sql.DB) *HTMLController {
 	return &HTMLController{
-		HTMLService: service,
+		DB: connection,
 	}
 }
 

@@ -12,3 +12,8 @@ CREATE TABLE IF NOT EXISTS posts (
     content TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    posts_count int  
+);
