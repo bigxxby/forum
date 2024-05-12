@@ -68,12 +68,16 @@ func Run() {
 	http.HandleFunc("/signUp", router.HTMLController.GET_HTML_SignUp)
 	http.HandleFunc("/signIn", router.HTMLController.GET_HTML_SignIn)
 
+	//TODO:
+	// http.HandleFunc("/posts/{ID}", router.HTMLController.GET_HTML_SignIn)
+
 	http.HandleFunc("/api/users/taken", router.UserController.GET_CheckIfLoginIsTaken)
 	http.HandleFunc("/api/signUp", router.UserController.POST_SignUp)
 	http.HandleFunc("/api/signIn", router.UserController.POST_SignIn)
 
 	http.HandleFunc("/api/posts", middlewares.AuthMiddleware(router.PostController.POST_PostPost, router.UserController.UserService))
 	http.HandleFunc("/api/posts/", router.PostController.GET_post)
+	http.HandleFunc("/api/posts/all", router.PostController.GET_posts)
 
 	staticDir := "/static/"
 	staticFileServer := http.StripPrefix(staticDir, http.FileServer(http.Dir("web/ui/static")))

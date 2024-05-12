@@ -11,6 +11,15 @@ import (
 )
 
 func (c *PostController) POST_PostPost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		httpHelper.MethodNotAllowedError(w)
+		return
+	}
+	if r.URL.Path != "/api/posts" {
+		httpHelper.NotFoundError(w)
+		return
+
+	}
 	userId := r.Context().Value("userId")
 	userIdNum, ok := userId.(int)
 	if !ok {

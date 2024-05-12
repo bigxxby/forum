@@ -1,6 +1,6 @@
 package post
 
-func (r *PostRepository) CreatePost(userId int, title, content string) (int, error) {
+func (r *PostRepository) INSERT_post(userId int, title, content string) (int, error) {
 	tx, err := r.DB.Begin()
 	if err != nil {
 		return -1, err

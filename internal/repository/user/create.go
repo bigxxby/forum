@@ -24,8 +24,8 @@ func (r *UserRepository) InsertAdmin(hash string) error {
 	}
 	defer tx.Rollback()
 
-	q := `INSERT INTO users (login , email , password) VALUES ( ? , ? , ?)`
-	_, err = tx.Exec(q, "bigxxby", "bigxxby@yandex.ru", hash)
+	q := `INSERT INTO users (uuid, login , email , password) VALUES (?, ? , ? , ?)`
+	_, err = tx.Exec(q, "asd", "bigxxby", "bigxxby@yandex.ru", hash)
 	if err != nil {
 		return err
 	}
