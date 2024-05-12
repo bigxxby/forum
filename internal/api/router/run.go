@@ -23,7 +23,11 @@ func Run() {
 		log.Println(err.Error())
 		return
 	}
+	// err := repository.
+
 	router := NewRouter(connection)
+
+	router.Controller.UserController.UserService.CreateAdmin()
 
 	http.HandleFunc("/", router.HTMLController.GET_HTML_Index)
 	http.HandleFunc("/signUp", router.HTMLController.GET_HTML_SignUp)

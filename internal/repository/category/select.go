@@ -20,3 +20,15 @@ func (repo *CategoryRepository) SELECT_categories() (map[string]int, error) {
 	}
 	return categories, nil
 }
+
+func (repo *CategoryRepository) SELECT_categoryByName(categoryName string) (int, error) {
+	q := `SELECT id FROM categories WHERE name = ?`
+
+	var id int
+	err := repo.DB.QueryRow(q, categoryName).Scan(&id)
+	if err != nil {
+		return -1, err
+	}
+	return id, nil
+
+}

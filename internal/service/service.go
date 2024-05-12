@@ -16,7 +16,7 @@ type Service struct {
 func NewService(repo *repository.Repository) *Service {
 	userService := user.NewUserService(repo.UserRepository)
 	categoryService := category.NewCategoryService(repo.CategoryRepository)
-	postService := post.NewPostService(repo.PostRepository)
+	postService := post.NewPostService(repo.PostRepository, categoryService.CategoryRepository)
 
 	return &Service{
 		Category: categoryService,

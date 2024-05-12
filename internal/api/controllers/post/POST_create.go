@@ -1,6 +1,7 @@
 package post
 
 import (
+	"database/sql"
 	"encoding/json"
 	"forum/internal/models"
 	"forum/pkg/httpHelper"
@@ -27,8 +28,9 @@ func (c *PostController) POST_PostPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := struct {
-		Content string `json:"content"`
-		Title   string `json:"title"`
+		Content  string `json:"content"`
+		Title    string `json:"title"`
+		Category string `json:"category"`
 	}{}
 
 	body, err := io.ReadAll(r.Body)
@@ -49,21 +51,23 @@ func (c *PostController) POST_PostPost(w http.ResponseWriter, r *http.Request) {
 		httpHelper.Unauthorised(w)
 		return
 	}
-	if data.Content == "" || data.Title == "" {
+	if data.Content == "" || data.Title == "" || data.Category == "" {
 		httpHelper.BadRequestError(w)
-		log.Println("2")
 
 		return
 	}
 	if !validation.IsValidPost(data.Title, data.Content) {
 		httpHelper.BadRequestError(w)
-		log.Println("1")
 		return
 	}
 	//VALIDATION
 
-	postId, err := c.PostService.CreatePost(userIdNum, data.Title, data.Content)
+	postId, err := c.PostService.CreatePost(userIdNum, data.Title, data.Content, data.Category)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			httpHelper.NotFoundError(w)
+			return
+		}
 		log.Println(err.Error())
 		httpHelper.InternalServerError(w)
 		return

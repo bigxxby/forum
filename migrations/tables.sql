@@ -10,10 +10,13 @@ CREATE TABLE IF NOT EXISTS posts (
     user_id INTEGER,
     title TEXT,
     content TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    category_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES categories(id)
 );
+
 CREATE TABLE IF NOT EXISTS categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    posts_count int  
+    name  TEXT UNIQUE NOT NULL,
+    posts_count INTEGER  
 );

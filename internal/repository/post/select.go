@@ -5,13 +5,14 @@ import "forum/internal/models"
 func (repo *PostRepository) SELECT_post(postId int) (*models.Post, error) {
 
 	q := `
-		SELECT p.*, u.login
+		SELECT p.id ,p.user_id ,p.title ,p.content ,p.created_at , u.login , c.name
 		FROM posts p
-		JOIN users u ON p.user_id = u.id
+		LEFT JOIN users u ON p.user_id = u.id
+		LEFT JOIN categories c ON p.category_id = c.id
 		WHERE p.id = ?;
 		`
 	var post models.Post
-	err := repo.DB.QueryRow(q, postId).Scan(&post.ID, &post.UserId, &post.Title, &post.Content, &post.CreatedAt, &post.CreatedBy)
+	err := repo.DB.QueryRow(q, postId).Scan(&post.ID, &post.UserId, &post.Title, &post.Content, &post.CreatedAt, &post.CreatedBy, &post.Category)
 	if err != nil {
 		return nil, err
 	}
@@ -21,11 +22,11 @@ func (repo *PostRepository) SELECT_post(postId int) (*models.Post, error) {
 func (repo *PostRepository) SELECT_postsCreatedAt() ([]models.Post, error) {
 
 	q := `
-		SELECT p.*, u.login
+		SELECT p.id, p.user_id, p.title, p.content, p.created_at, u.login, c.name
 		FROM posts p
-		JOIN users u ON p.user_id = u.id
-		ORDER BY created_at DESC;
-
+		LEFT JOIN users u ON p.user_id = u.id
+		LEFT JOIN categories c ON p.category_id = c.id
+		ORDER BY p.created_at DESC;
 	`
 
 	var posts []models.Post
@@ -39,7 +40,7 @@ func (repo *PostRepository) SELECT_postsCreatedAt() ([]models.Post, error) {
 	for rows.Next() {
 		var post models.Post
 
-		err := rows.Scan(&post.ID, &post.UserId, &post.Title, &post.Content, &post.CreatedAt, &post.CreatedBy)
+		err := rows.Scan(&post.ID, &post.UserId, &post.Title, &post.Content, &post.CreatedAt, &post.CreatedBy, &post.Category)
 		if err != nil {
 			return nil, err
 		}
