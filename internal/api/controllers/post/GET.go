@@ -12,7 +12,7 @@ func (c *PostController) GET_post(w http.ResponseWriter, r *http.Request) {
 		httpHelper.MethodNotAllowedError(w)
 		return
 	}
-	postId := httpHelper.GetPostIdFromPath(r.URL.Path)
+	postId := httpHelper.GetIdFromString(r.PathValue("id"))
 	if postId == -1 {
 		httpHelper.BadRequestError(w)
 		return
@@ -48,6 +48,7 @@ func (c *PostController) GET_posts(w http.ResponseWriter, r *http.Request) {
 		httpHelper.InternalServerError(w)
 		return
 	}
+
 	httpHelper.WriteJson(w, 200, posts)
 
 }

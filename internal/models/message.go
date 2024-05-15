@@ -7,9 +7,9 @@ type AuthenticationMessage struct {
 	Message string `json:"message"`
 	UUID    string `json:"uuid"`
 }
-type PostCreationMessage struct {
+type CreationMessage struct {
 	Message string `json:"message"`
-	PostId  int    `json:"postId"`
+	Id      int    `json:"id"`
 }
 type BadRequest struct {
 	Message string `json:"message"`

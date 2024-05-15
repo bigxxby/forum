@@ -72,9 +72,9 @@ func (c *PostController) POST_PostPost(w http.ResponseWriter, r *http.Request) {
 		httpHelper.InternalServerError(w)
 		return
 	}
-	httpHelper.WriteJson(w, http.StatusOK, models.PostCreationMessage{
+	httpHelper.WriteJson(w, http.StatusOK, models.CreationMessage{
 		Message: "Post created :)",
-		PostId:  postId,
+		Id:      postId,
 	})
 
 }

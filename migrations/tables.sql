@@ -20,3 +20,13 @@ CREATE TABLE IF NOT EXISTS categories (
     name  TEXT UNIQUE NOT NULL,
     posts_count INTEGER  
 );
+CREATE TABLE IF NOT EXISTS comments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    post_id  INTEGER,
+    user_id TEXT, 
+    content TEXT, 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    edited BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY  (post_id) REFERENCES posts(id),
+    FOREIGN KEY  (user_id) REFERENCES users(id)
+);

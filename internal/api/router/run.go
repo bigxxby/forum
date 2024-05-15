@@ -24,32 +24,35 @@ func Run() {
 		return
 	}
 	// err := repository.
-
+	mux := http.NewServeMux()
 	router := NewRouter(connection)
 
 	router.Controller.UserController.UserService.CreateAdmin()
 
-	http.HandleFunc("/", router.HTMLController.GET_HTML_Index)
-	http.HandleFunc("/signUp", router.HTMLController.GET_HTML_SignUp)
-	http.HandleFunc("/signIn", router.HTMLController.GET_HTML_SignIn)
+	mux.HandleFunc("/", router.HTMLController.GET_HTML_Index)
+	mux.HandleFunc("/signUp", router.HTMLController.GET_HTML_SignUp)
+	mux.HandleFunc("/signIn", router.HTMLController.GET_HTML_SignIn)
 
 	//TODO:
 	// http.HandleFunc("/posts/{ID}", router.HTMLController.GET_HTML_SignIn)
 
-	http.HandleFunc("/api/users/taken", router.Controller.UserController.GET_CheckIfLoginIsTaken)
-	http.HandleFunc("/api/signUp", router.Controller.UserController.POST_SignUp)
-	http.HandleFunc("/api/signIn", router.Controller.UserController.POST_SignIn)
+	mux.HandleFunc("/api/users/taken", router.Controller.UserController.GET_CheckIfLoginIsTaken)
+	mux.HandleFunc("/api/signUp", router.Controller.UserController.POST_SignUp)
+	mux.HandleFunc("/api/signIn", router.Controller.UserController.POST_SignIn)
 
-	http.HandleFunc("/api/posts", middlewares.AuthMiddleware(router.Controller.PostController.POST_PostPost, router.Controller.UserController.UserService))
-	http.HandleFunc("/api/posts/", router.Controller.PostController.GET_post)
-	http.HandleFunc("/api/posts/all", router.Controller.PostController.GET_posts)
+	mux.HandleFunc("/api/posts", middlewares.AuthMiddleware(router.Controller.PostController.POST_PostPost, router.Controller.UserController.UserService))
+	mux.HandleFunc("/api/posts/{id}", router.Controller.PostController.GET_post)
+	mux.HandleFunc("/api/posts/all", router.Controller.PostController.GET_posts)
 
-	http.HandleFunc("/api/categories", router.Controller.CategoryController.GET_categories)
+	mux.HandleFunc("/api/categories", router.Controller.CategoryController.GET_categories)
+
+	mux.HandleFunc("/api/comments/{id}", router.Controller.CommentController.GET_Comments)
+	mux.HandleFunc("/api/comments/p/{id}", middlewares.AuthMiddleware(router.Controller.CommentController.POST_Comment, router.Controller.UserController.UserService))
 
 	staticDir := "/static/"
 	staticFileServer := http.StripPrefix(staticDir, http.FileServer(http.Dir("web/ui/static")))
 	http.Handle(staticDir, staticFileServer)
 
 	log.Println("Server started at http://localhost:8080/")
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8080", mux)
 }
