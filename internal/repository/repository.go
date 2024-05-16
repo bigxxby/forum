@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"forum/internal/repository/category"
 	"forum/internal/repository/comment"
+	"forum/internal/repository/likes"
 	"forum/internal/repository/post"
 	"forum/internal/repository/user"
 )
@@ -13,20 +14,21 @@ type Repository struct {
 	CategoryRepository *category.CategoryRepository
 	PostRepository     *post.PostRepository
 	CommentRepo        *comment.CommentRepo
+	LikesRepo          *likes.LikesRepo
 }
 
 func NewRepository(db *sql.DB) *Repository {
-	// Инициализация репозиториев для пользователей, категорий и постов
 	userRepo := user.NewUserRepository(db)
 	categoryRepo := category.NewCategoryRepository(db)
 	postRepo := post.NewPostRepository(db)
-	commnetRepo := comment.NewCommentRepo(db)
+	commentRepo := comment.NewCommentRepo(db)
+	likesRepo := likes.NewLikesRepo(db)
 
-	// Создание экземпляра Repository с инициализированными репозиториями
 	return &Repository{
 		UserRepository:     userRepo,
 		CategoryRepository: categoryRepo,
 		PostRepository:     postRepo,
-		CommentRepo:        commnetRepo,
+		CommentRepo:        commentRepo,
+		LikesRepo:          likesRepo,
 	}
 }

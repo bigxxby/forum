@@ -18,8 +18,8 @@ type Service struct {
 func NewService(repo *repository.Repository) *Service {
 	userService := user.NewUserService(repo.UserRepository)
 	categoryService := category.NewCategoryService(repo.CategoryRepository)
-	postService := post.NewPostService(repo.PostRepository, categoryService.CategoryRepository)
-	commentService := comment.NewCommentService(repo.CommentRepo)
+	postService := post.NewPostService(repo.PostRepository, categoryService.CategoryRepository, repo.LikesRepo)
+	commentService := comment.NewCommentService(repo.CommentRepo, repo.LikesRepo)
 
 	return &Service{
 		Category: categoryService,

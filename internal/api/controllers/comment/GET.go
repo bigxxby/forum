@@ -15,7 +15,9 @@ func (c *CommentController) GET_Comments(w http.ResponseWriter, r *http.Request)
 		httpHelper.BadRequestError(w)
 		return
 	}
-	comments, err := c.CommentService.GetAllCommentsOfAPost(postId)
+	userId := r.Context().Value("userId")
+	userIdNum, _ := userId.(int)
+	comments, err := c.CommentService.GetAllCommentsOfAPost(postId, userIdNum)
 	if err != nil {
 		httpHelper.WriteJson(w, 404, comments)
 		return
