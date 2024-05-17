@@ -13,4 +13,5 @@ type Comment struct {
 	Liked     bool      `json:"liked"`
 	CreatedBy string    `json:"createdBy"`
 	CreatedAt time.Time `json:"created_at"`
+	Reply     *Comment  `json:"reply"`
 }

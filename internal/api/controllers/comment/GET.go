@@ -24,7 +24,6 @@ func (c *CommentController) GET_Comments(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	httpHelper.WriteJson(w, 404, comments)
-
 }
 func (c *CommentController) GET_LikedComments(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
