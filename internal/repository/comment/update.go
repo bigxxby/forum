@@ -1,5 +1,9 @@
 package comment
 
+import (
+	"database/sql"
+)
+
 func (repo *CommentRepo) UPDATE_like(commentId int, liked bool) error {
 	tx, err := repo.DB.Begin()
 	if err != nil {
@@ -18,13 +22,22 @@ func (repo *CommentRepo) UPDATE_like(commentId int, liked bool) error {
 		`
 	}
 
-	_, err = tx.Exec(q, commentId)
+	res, err := tx.Exec(q, commentId)
 	if err != nil {
 		return err
 	}
+
+	last, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if last == 0 {
+		return sql.ErrNoRows
+	}
+
 	err = tx.Commit()
 	if err != nil {
-		return nil
+		return err
 	}
 	return nil
 }

@@ -53,3 +53,32 @@ func (repo *PostRepository) SELECT_postsCreatedAt(userId int) ([]models.Post, er
 	}
 	return posts, nil
 }
+func (repo *PostRepository) SELECT_liked_posts(userId int) ([]models.Post, error) {
+	q := `
+        SELECT p.id, p.user_id, p.title, p.content, p.created_at, u.login, p.likes, c.name
+        FROM posts p
+        LEFT JOIN users u ON p.user_id = u.id
+        LEFT JOIN categories c ON p.category_id = c.id
+        LEFT JOIN likes l ON l.user_id = ?
+        WHERE l.post_id = p.id
+		ORDER BY l.id;
+    `
+	var posts []models.Post
+
+	rows, err := repo.DB.Query(q, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var post models.Post
+
+		err := rows.Scan(&post.ID, &post.UserId, &post.Title, &post.Content, &post.CreatedAt, &post.CreatedBy, &post.Likes, &post.Category)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+	return posts, nil
+}

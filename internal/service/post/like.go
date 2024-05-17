@@ -6,6 +6,11 @@ import (
 
 func (s *PostService) LikePost(userId, postId int) error {
 
+	_, _, err := s.PostRepository.SELECT_post(postId, userId)
+	if err != nil {
+		return err
+	}
+
 	liked, err := s.LikesRepo.SELECT_alreadyLikedPost(userId, postId)
 	if err != nil {
 		return err

@@ -16,6 +16,7 @@ func WriteJson(w http.ResponseWriter, code int, data interface{}) {
 
 	_, err = w.Write(jsonData)
 	if err != nil {
+
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}

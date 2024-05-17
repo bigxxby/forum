@@ -1,6 +1,7 @@
 package post
 
 import (
+	"database/sql"
 	"forum/internal/models"
 	"forum/pkg/httpHelper"
 	"log"
@@ -27,6 +28,10 @@ func (c *PostController) POST_Like(w http.ResponseWriter, r *http.Request) {
 
 	err := c.PostService.LikePost(userIdNum, postIdNum)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			httpHelper.NotFoundError(w)
+			return
+		}
 		if err.Error() == "post already liked" {
 			httpHelper.ConflictError(w)
 			return
@@ -40,6 +45,9 @@ func (c *PostController) POST_Like(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+////////
+
+// //
 func (c *PostController) POST_Unlike(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		httpHelper.MethodNotAllowedError(w)

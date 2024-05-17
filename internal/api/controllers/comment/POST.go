@@ -1,6 +1,7 @@
 package comment
 
 import (
+	"database/sql"
 	"encoding/json"
 	"forum/internal/models"
 	"forum/pkg/httpHelper"
@@ -76,6 +77,10 @@ func (c *CommentController) POST_Like(w http.ResponseWriter, r *http.Request) {
 	}
 	err := c.CommentService.LikeComment(userIdNum, commentId)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			httpHelper.NotFoundError(w)
+			return
+		}
 		if err.Error() == "comment already liked" {
 			httpHelper.ConflictError(w)
 			return
@@ -105,7 +110,12 @@ func (c *CommentController) POST_UnLike(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	err := c.CommentService.UnLikeComment(userIdNum, commentId)
+
 	if err != nil {
+		if err == sql.ErrNoRows {
+			httpHelper.NotFoundError(w)
+			return
+		}
 		if err.Error() == "comment not liked" {
 			httpHelper.ConflictError(w)
 			return

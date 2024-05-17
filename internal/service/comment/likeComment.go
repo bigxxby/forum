@@ -12,6 +12,7 @@ func (s *CommentService) LikeComment(userId int, commentId int) error {
 	if liked {
 		return errors.New("comment already liked")
 	}
+
 	err = s.CommentRepo.UPDATE_like(commentId, true)
 	if err != nil {
 		return err
@@ -22,6 +23,7 @@ func (s *CommentService) LikeComment(userId int, commentId int) error {
 	}
 	return nil
 }
+
 func (s *CommentService) UnLikeComment(userId int, commentId int) error { //
 	liked, err := s.LikeRepo.SELECT_alreadyLikedComment(userId, commentId)
 	if err != nil {
