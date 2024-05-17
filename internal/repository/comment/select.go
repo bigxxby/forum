@@ -8,7 +8,7 @@ func (repo *CommentRepo) SELECT_Comments(postId int, userId int) ([]models.Comme
 	q := `
     SELECT  c.id, c.post_id, c.user_id, c.content, c.edited, u.login, c.likes, c.created_at , CASE WHEN l.user_id IS NOT NULL THEN true ELSE false END 
     FROM comments c 
-    JOIN users u ON u.id = c.user_id
+    LEFT JOIN users u ON u.id = c.user_id
     LEFT JOIN likes l ON l.user_id = ? AND c.id = l.comment_id
     WHERE c.post_id = ?
 	ORDER BY created_at DESC
@@ -46,7 +46,7 @@ func (repo *CommentRepo) SELECT_Comments(postId int, userId int) ([]models.Comme
 }
 func (repo *CommentRepo) SELECT_liked_comments(userId int) ([]models.Comment, error) {
 	q := `
-    SELECT c.id, c.post_id, c.user_id, c.content, c.edited, u.login, c.likes, c.created_at
+    SELECT c.id,  c.parent_id, c.post_id, c.user_id, c.content, c.edited, u.login, c.likes, c.created_at
     FROM comments c 
     JOIN users u ON u.id = c.user_id
 	JOIN likes l ON l.user_id = ?
@@ -64,6 +64,7 @@ func (repo *CommentRepo) SELECT_liked_comments(userId int) ([]models.Comment, er
 		var comment models.Comment
 		err := rows.Scan(
 			&comment.ID,
+			&comment.ParentId,
 			&comment.PostID,
 			&comment.UserID,
 			&comment.Content,
@@ -72,11 +73,13 @@ func (repo *CommentRepo) SELECT_liked_comments(userId int) ([]models.Comment, er
 			&comment.Likes,
 			&comment.CreatedAt,
 		)
+		comment.Liked = true
 		if err != nil {
 			return nil, err
 		}
 		comments = append(comments, comment)
 	}
+
 	err = rows.Err()
 	if err != nil {
 		return nil, err

@@ -2,6 +2,7 @@ package comment
 
 import (
 	"forum/pkg/httpHelper"
+	"log"
 	"net/http"
 )
 
@@ -10,7 +11,7 @@ func (c *CommentController) GET_Comments(w http.ResponseWriter, r *http.Request)
 		httpHelper.MethodNotAllowedError(w)
 		return
 	}
-	postId := httpHelper.GetIdFromString(r.PathValue("id"))
+	postId := httpHelper.GetIdFromString(r.PathValue("postId"))
 	if postId == -1 {
 		httpHelper.BadRequestError(w)
 		return
@@ -34,6 +35,7 @@ func (c *CommentController) GET_LikedComments(w http.ResponseWriter, r *http.Req
 	userIdNum, _ := userId.(int)
 	comments, err := c.CommentService.GetAllLikedComments(userIdNum)
 	if err != nil {
+		log.Println(err.Error())
 		httpHelper.WriteJson(w, 404, comments)
 		return
 	}

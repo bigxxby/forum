@@ -29,8 +29,10 @@ CREATE TABLE IF NOT EXISTS comments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     edited BOOLEAN DEFAULT FALSE,
     likes INTEGER DEFAULT 0,
+    parent_id INTEGER NULL,
     FOREIGN KEY  (post_id) REFERENCES posts(id),
     FOREIGN KEY  (user_id) REFERENCES users(id)
+    FOREIGN KEY  (parent_id) REFERENCES comments(id)
 );
 
 

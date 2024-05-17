@@ -78,6 +78,7 @@ func (repo *PostRepository) SELECT_liked_posts(userId int) ([]models.Post, error
 		if err != nil {
 			return nil, err
 		}
+		post.Liked = true
 		posts = append(posts, post)
 	}
 	return posts, nil
