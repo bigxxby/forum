@@ -57,8 +57,6 @@ func Run() {
 	mux.HandleFunc("/api/comments/liked", middlewares.AuthMiddleware(router.Controller.CommentController.GET_LikedComments, router.Controller.UserController.UserService))
 	mux.HandleFunc("/api/comments/{postId}", middlewares.AuthMiddleware(router.Controller.CommentController.GET_Comments, router.Controller.UserController.UserService))
 
-	mux.HandleFunc("/api/comments/{parentId}/reply", middlewares.AuthMiddleware(router.Controller.CommentController.POST_Reply, router.Controller.UserController.UserService))
-
 	// mux.HandleFunc("/api/likes/posts", middlewares.AuthMiddleware(router.Controller.CommentController.GET_Comments, router.Controller.UserController.UserService))
 	// mux.HandleFunc("/api/likes/comments", middlewares.AuthMiddleware(router.Controller.CommentController.GET_Comments, router.Controller.UserController.UserService))
 
