@@ -42,7 +42,7 @@ func Run() {
 
 	mux.HandleFunc("/api/posts", middlewares.AuthMiddleware(router.Controller.PostController.POST_PostPost, router.Controller.UserController.UserService))
 	mux.HandleFunc("/api/posts/{id}/like", middlewares.AuthMiddleware(router.Controller.PostController.POST_Like, router.Controller.UserController.UserService))
-	mux.HandleFunc("/api/posts/{id}/unlike", middlewares.AuthMiddleware(router.Controller.PostController.POST_Unlike, router.Controller.UserController.UserService))
+	mux.HandleFunc("/api/posts/{id}/dislike", middlewares.AuthMiddleware(router.Controller.PostController.POST_DisLike, router.Controller.UserController.UserService))
 
 	mux.HandleFunc("/api/posts/{id}", middlewares.AuthMiddleware(router.Controller.PostController.GET_post, router.Controller.UserController.UserService))
 	mux.HandleFunc("/api/posts/all", middlewares.AuthMiddleware(router.Controller.PostController.GET_posts, router.Controller.UserController.UserService))
@@ -52,7 +52,7 @@ func Run() {
 
 	mux.HandleFunc("/api/comments/{id}/post", middlewares.AuthMiddleware(router.Controller.CommentController.POST_Comment, router.Controller.UserController.UserService))
 	mux.HandleFunc("/api/comments/{id}/like", middlewares.AuthMiddleware(router.Controller.CommentController.POST_Like, router.Controller.UserController.UserService))
-	mux.HandleFunc("/api/comments/{id}/unlike", middlewares.AuthMiddleware(router.Controller.CommentController.POST_UnLike, router.Controller.UserController.UserService))
+	mux.HandleFunc("/api/comments/{id}/dislike", middlewares.AuthMiddleware(router.Controller.CommentController.POST_DisLike, router.Controller.UserController.UserService))
 
 	mux.HandleFunc("/api/comments/liked", middlewares.AuthMiddleware(router.Controller.CommentController.GET_LikedComments, router.Controller.UserController.UserService))
 	mux.HandleFunc("/api/comments/{postId}", middlewares.AuthMiddleware(router.Controller.CommentController.GET_Comments, router.Controller.UserController.UserService))

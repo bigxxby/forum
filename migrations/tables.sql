@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS posts (
     category_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     likes INTEGER DEFAULT 0,
+    dislikes INTEGER DEFAULT 0,
     FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
@@ -29,17 +30,19 @@ CREATE TABLE IF NOT EXISTS comments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     edited BOOLEAN DEFAULT FALSE,
     likes INTEGER DEFAULT 0,
+    dislikes INTEGER DEFAULT 0,
     parent_id INTEGER NULL,
     FOREIGN KEY  (post_id) REFERENCES posts(id),
     FOREIGN KEY  (user_id) REFERENCES users(id)
 );
 
 
-CREATE TABLE IF NOT EXISTS likes (
+CREATE TABLE IF NOT EXISTS likes_dislikes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
     post_id INTEGER,
     comment_id INTEGER,
+    value BOOLEAN,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (post_id) REFERENCES posts(id),
     FOREIGN KEY (comment_id) REFERENCES comments(id)

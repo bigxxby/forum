@@ -9,7 +9,9 @@ type Post struct {
 	Content   string    `json:"content"`
 	Category  string    `json:"category"`
 	Likes     int       `json:"likes"`
+	Dislikes  int       `json:"dislikes"`
 	Liked     bool      `json:"liked"`
+	Disliked  bool      `json:"disliked"`
 	CreatedBy string    `json:"createdBy"`
 	CreatedAt time.Time `json:"createdAt"`
 }

@@ -6,41 +6,14 @@ import (
 
 func (repo *CommentRepo) SELECT_Comments(postId int, userId int) ([]models.Comment, error) {
 	q := `
-    WITH RECURSIVE CommentTree AS (
-        -- Начальные комментарии верхнего уровня
-        SELECT
-            c.id, c.post_id, c.parent_id, c.user_id, c.content, c.edited, u.login, c.likes, c.created_at,
-            CASE WHEN l.user_id IS NOT NULL THEN true ELSE false END AS liked,
-            0 AS level
-        FROM
-            comments c
-        LEFT JOIN users u ON u.id = c.user_id
-        LEFT JOIN likes l ON l.user_id = ? AND c.id = l.comment_id
-        WHERE
-            c.post_id = ? AND c.parent_id IS NULL
-        
-        UNION ALL
-        
-        -- Рекурсивное добавление ответов на комментарии
-        SELECT
-            c.id, c.post_id, c.parent_id, c.user_id, c.content, c.edited, u.login, c.likes, c.created_at,
-            CASE WHEN l.user_id IS NOT NULL THEN true ELSE false END AS liked,
-            ct.level + 1 AS level
-        FROM
-            comments c
-        INNER JOIN CommentTree ct ON c.parent_id = ct.id
-        LEFT JOIN users u ON u.id = c.user_id
-        LEFT JOIN likes l ON l.user_id = ? AND c.id = l.comment_id
-    )
-    SELECT
-        id, post_id, parent_id, user_id, content, edited, login, likes, created_at, liked, level
-    FROM
-        CommentTree
-    ORDER BY
-        level, created_at;
+    SELECT  c.id, c.post_id , c.parent_id, c.user_id, c.content, c.edited, u.login, c.likes, c.created_at , CASE WHEN l.user_id IS NOT NULL THEN true ELSE false END 
+    FROM comments c 
+    LEFT JOIN users u ON u.id = c.user_id
+    LEFT JOIN likes l ON l.user_id = ? AND c.id = l.comment_id
+    WHERE c.post_id = ?
+	ORDER BY created_at DESC
     `
-
-	rows, err := repo.DB.Query(q, userId, postId, userId)
+	rows, err := repo.DB.Query(q, userId, postId)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +33,6 @@ func (repo *CommentRepo) SELECT_Comments(postId int, userId int) ([]models.Comme
 			&comment.Likes,
 			&comment.CreatedAt,
 			&comment.Liked,
-			&comment.Level, // Добавлен уровень вложенности
 		)
 		if err != nil {
 			return nil, err
@@ -79,8 +51,8 @@ func (repo *CommentRepo) SELECT_liked_comments(userId int) ([]models.Comment, er
     SELECT c.id,  c.parent_id, c.post_id, c.user_id, c.content, c.edited, u.login, c.likes, c.created_at
     FROM comments c 
     JOIN users u ON u.id = c.user_id
-	JOIN likes l ON l.user_id = ?
-	WHERE l.comment_id = c.id
+	JOIN likes_dislikes l ON l.user_id = ?
+	WHERE l.comment_id = c.id AND l.value = 1
 	ORDER BY l.id
     `
 	rows, err := repo.DB.Query(q, userId)

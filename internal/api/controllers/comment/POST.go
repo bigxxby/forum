@@ -75,14 +75,10 @@ func (c *CommentController) POST_Like(w http.ResponseWriter, r *http.Request) {
 		httpHelper.Unauthorised(w)
 		return
 	}
-	err := c.CommentService.LikeComment(userIdNum, commentId)
+	value, err := c.CommentService.LikeOrUnlikeComment(userIdNum, commentId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			httpHelper.NotFoundError(w)
-			return
-		}
-		if err.Error() == "comment already liked" {
-			httpHelper.ConflictError(w)
 			return
 		}
 		log.Println(err.Error())
@@ -90,10 +86,10 @@ func (c *CommentController) POST_Like(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpHelper.WriteJson(w, 200, models.DefaultMessage{
-		Message: "Liked :)",
+		Message: value,
 	})
 }
-func (c *CommentController) POST_UnLike(w http.ResponseWriter, r *http.Request) {
+func (c *CommentController) POST_DisLike(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		httpHelper.MethodNotAllowedError(w)
 		return
@@ -109,15 +105,10 @@ func (c *CommentController) POST_UnLike(w http.ResponseWriter, r *http.Request) 
 		httpHelper.Unauthorised(w)
 		return
 	}
-	err := c.CommentService.UnLikeComment(userIdNum, commentId)
-
+	value, err := c.CommentService.DisLikeOrUnDislikeComment(userIdNum, commentId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			httpHelper.NotFoundError(w)
-			return
-		}
-		if err.Error() == "comment not liked" {
-			httpHelper.ConflictError(w)
 			return
 		}
 		log.Println(err.Error())
@@ -125,6 +116,42 @@ func (c *CommentController) POST_UnLike(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	httpHelper.WriteJson(w, 200, models.DefaultMessage{
-		Message: "UnLiked :(",
+		Message: value,
 	})
 }
+
+// func (c *CommentController) POST_UnLike(w http.ResponseWriter, r *http.Request) {
+// 	if r.Method != "POST" {
+// 		httpHelper.MethodNotAllowedError(w)
+// 		return
+// 	}
+// 	commentId := httpHelper.GetIdFromString(r.PathValue("id"))
+// 	if commentId == -1 {
+// 		httpHelper.BadRequestError(w)
+// 		return
+// 	}
+// 	userId := r.Context().Value("userId")
+// 	userIdNum, ok := userId.(int)
+// 	if !ok {
+// 		httpHelper.Unauthorised(w)
+// 		return
+// 	}
+// 	err := c.CommentService.UnLikeComment(userIdNum, commentId)
+
+// 	if err != nil {
+// 		if err == sql.ErrNoRows {
+// 			httpHelper.NotFoundError(w)
+// 			return
+// 		}
+// 		if err.Error() == "comment not liked" {
+// 			httpHelper.ConflictError(w)
+// 			return
+// 		}
+// 		log.Println(err.Error())
+// 		httpHelper.InternalServerError(w)
+// 		return
+// 	}
+// 	httpHelper.WriteJson(w, 200, models.DefaultMessage{
+// 		Message: "UnLiked :(",
+// 	})
+// }
