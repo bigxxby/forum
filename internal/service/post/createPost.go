@@ -14,5 +14,6 @@ func (s *PostService) CreatePost(userId int, title, content string, categoryName
 	if err != nil {
 		return -1, err
 	}
+
 	return postId, nil
 }

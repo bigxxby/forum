@@ -1,10 +1,11 @@
 CREATE TABLE IF NOT EXISTS users (
-    id  INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     uuid TEXT,
     login TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password TEXT UNIQUE NOT NULL
 );
+
 CREATE TABLE IF NOT EXISTS posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
@@ -14,27 +15,28 @@ CREATE TABLE IF NOT EXISTS posts (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     likes INTEGER DEFAULT 0,
     dislikes INTEGER DEFAULT 0,
-    FOREIGN KEY (category_id) REFERENCES categories(id)
+    FOREIGN KEY (category_id) REFERENCES categories(id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name  TEXT UNIQUE NOT NULL,
-    posts_count INTEGER  
+    name TEXT UNIQUE NOT NULL,
+    posts_count INTEGER
 );
+
 CREATE TABLE IF NOT EXISTS comments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    post_id  INTEGER,
-    user_id TEXT, 
+    post_id INTEGER,
+    user_id INTEGER, 
     content TEXT, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     edited BOOLEAN DEFAULT FALSE,
     likes INTEGER DEFAULT 0,
     dislikes INTEGER DEFAULT 0,
-    FOREIGN KEY  (post_id) REFERENCES posts(id),
-    FOREIGN KEY  (user_id) REFERENCES users(id)
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
-
 
 CREATE TABLE IF NOT EXISTS likes_dislikes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,7 +44,7 @@ CREATE TABLE IF NOT EXISTS likes_dislikes (
     post_id INTEGER,
     comment_id INTEGER,
     value BOOLEAN,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (post_id) REFERENCES posts(id),
-    FOREIGN KEY (comment_id) REFERENCES comments(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE
 );
