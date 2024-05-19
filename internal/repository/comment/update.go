@@ -78,3 +78,30 @@ func (repo *CommentRepo) UPDATE_dislike(commentId int, liked bool) error {
 	}
 	return nil
 }
+func (repo *CommentRepo) UPDATE_comment(content string, commentId int, userId int) error {
+	tx, err := repo.DB.Begin()
+	if err != nil {
+		return err
+	}
+	q := `
+	UPDATE comments SET content = ? , edited = 1 WHERE id = ? AND user_id = ?
+	`
+
+	res, err := tx.Exec(q, content, commentId, userId)
+	if err != nil {
+		return err
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return sql.ErrNoRows
+	}
+	defer tx.Rollback()
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+	return nil
+}

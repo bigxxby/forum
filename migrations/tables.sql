@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
     uuid TEXT,
     login TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL
+    password TEXT UNIQUE NOT NULL
 );
 CREATE TABLE IF NOT EXISTS posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,7 +31,6 @@ CREATE TABLE IF NOT EXISTS comments (
     edited BOOLEAN DEFAULT FALSE,
     likes INTEGER DEFAULT 0,
     dislikes INTEGER DEFAULT 0,
-    parent_id INTEGER NULL,
     FOREIGN KEY  (post_id) REFERENCES posts(id),
     FOREIGN KEY  (user_id) REFERENCES users(id)
 );

@@ -51,6 +51,7 @@ func Run() {
 	mux.HandleFunc("/api/categories", router.Controller.CategoryController.GET_categories)
 
 	mux.HandleFunc("/api/comments/{id}/post", middlewares.AuthMiddleware(router.Controller.CommentController.POST_Comment, router.Controller.UserController.UserService))
+	mux.HandleFunc("/api/comments/{id}/edit", middlewares.AuthMiddleware(router.Controller.CommentController.PUT_EditComment, router.Controller.UserController.UserService))
 	mux.HandleFunc("/api/comments/{id}/like", middlewares.AuthMiddleware(router.Controller.CommentController.POST_Like, router.Controller.UserController.UserService))
 	mux.HandleFunc("/api/comments/{id}/dislike", middlewares.AuthMiddleware(router.Controller.CommentController.POST_DisLike, router.Controller.UserController.UserService))
 
