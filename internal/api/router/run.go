@@ -61,28 +61,41 @@ func registerHTMLRoutes(mux *http.ServeMux, router *Router) {
 // registerAPIRoutes регистрирует маршруты для API
 func registerAPIRoutes(mux *http.ServeMux, router *Router) {
 	// User API
+
+	////GET
 	mux.HandleFunc("/api/users/taken", router.Controller.UserController.GET_CheckIfLoginIsTaken)
+
+	////POST
 	mux.HandleFunc("/api/signUp", router.Controller.UserController.POST_SignUp)
 	mux.HandleFunc("/api/signIn", router.Controller.UserController.POST_SignIn)
 
 	// Post API
+	////POST
 	mux.HandleFunc("/api/posts", middlewares.AuthMiddleware(router.Controller.PostController.POST_PostPost, router.Controller.UserController.UserService))
 	mux.HandleFunc("/api/posts/{id}/like", middlewares.AuthMiddleware(router.Controller.PostController.POST_Like, router.Controller.UserController.UserService))
 	mux.HandleFunc("/api/posts/{id}/dislike", middlewares.AuthMiddleware(router.Controller.PostController.POST_DisLike, router.Controller.UserController.UserService))
+	////GET
 	mux.HandleFunc("/api/posts/{id}", middlewares.AuthMiddleware(router.Controller.PostController.GET_post, router.Controller.UserController.UserService))
 	mux.HandleFunc("/api/posts/all", middlewares.AuthMiddleware(router.Controller.PostController.GET_posts, router.Controller.UserController.UserService))
+
+	mux.HandleFunc("/api/posts/filter/category", middlewares.AuthMiddleware(router.Controller.PostController.GET_postsByCategory, router.Controller.UserController.UserService))
+
 	mux.HandleFunc("/api/posts/liked", middlewares.AuthMiddleware(router.Controller.PostController.GET_likedPosts, router.Controller.UserController.UserService))
 
 	// Comment API
+	////POST
 	mux.HandleFunc("/api/comments/{id}/post", middlewares.AuthMiddleware(router.Controller.CommentController.POST_Comment, router.Controller.UserController.UserService))
 	mux.HandleFunc("/api/comments/{id}/like", middlewares.AuthMiddleware(router.Controller.CommentController.POST_Like, router.Controller.UserController.UserService))
 	mux.HandleFunc("/api/comments/{id}/dislike", middlewares.AuthMiddleware(router.Controller.CommentController.POST_DisLike, router.Controller.UserController.UserService))
 	mux.HandleFunc("/api/comments/{id}/edit", middlewares.AuthMiddleware(router.Controller.CommentController.PUT_EditComment, router.Controller.UserController.UserService))
+	////DELETE
 	mux.HandleFunc("/api/comments/{id}/delete", middlewares.AuthMiddleware(router.Controller.CommentController.DELETE_Comment, router.Controller.UserController.UserService))
+	////GET
 	mux.HandleFunc("/api/comments/liked", middlewares.AuthMiddleware(router.Controller.CommentController.GET_LikedComments, router.Controller.UserController.UserService))
 	mux.HandleFunc("/api/comments/{postId}", middlewares.AuthMiddleware(router.Controller.CommentController.GET_Comments, router.Controller.UserController.UserService))
 
 	// Category API
+	////GET
 	mux.HandleFunc("/api/categories", router.Controller.CategoryController.GET_categories)
 }
 

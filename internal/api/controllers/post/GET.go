@@ -83,3 +83,35 @@ func (c *PostController) GET_likedPosts(w http.ResponseWriter, r *http.Request) 
 	httpHelper.WriteJson(w, 200, posts)
 
 }
+func (c *PostController) GET_postsByCategory(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		httpHelper.MethodNotAllowedError(w)
+		return
+	}
+	if r.URL.Path != "/api/posts/filter/category" {
+		httpHelper.NotFoundError(w)
+		return
+	}
+
+	userId := r.Context().Value("userId")
+	userIdNum, _ := userId.(int)
+
+	categoryName := r.URL.Query().Get("name")
+	if categoryName == "" {
+		httpHelper.BadRequestError(w)
+		return
+	}
+	posts, err := c.PostService.GetAllPostsByCategory(categoryName, userIdNum)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			httpHelper.NotFoundError(w)
+			return
+		}
+		log.Println(err.Error())
+		httpHelper.InternalServerError(w)
+		return
+	}
+
+	httpHelper.WriteJson(w, 200, posts)
+
+}

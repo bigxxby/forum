@@ -189,3 +189,67 @@ func (repo *PostRepository) SELECT_liked_posts(userId int) ([]models.Post, error
 	}
 	return posts, nil
 }
+func (repo *PostRepository) SELECT_postsByCategory(userId int, categoryName string) ([]models.Post, error) {
+	q := `
+        SELECT 
+            p.id, 
+            p.user_id, 
+            p.title, 
+            p.content, 
+            p.created_at, 
+            u.login, 
+            p.likes, 
+            c.name,
+            p.dislikes,
+            CASE WHEN l1.value IS NOT NULL THEN true ELSE false END AS liked,
+            CASE WHEN l2.value IS NOT NULL THEN true ELSE false END AS disliked
+        FROM 
+            posts p
+        LEFT JOIN 
+            users u ON p.user_id = u.id
+        LEFT JOIN 
+            categories c ON p.category_id = c.id
+        LEFT JOIN 
+            likes_dislikes l1 ON p.id = l1.post_id AND l1.user_id = ? AND l1.value = true
+        LEFT JOIN 
+            likes_dislikes l2 ON p.id = l2.post_id AND l2.user_id = ? AND l2.value = false
+        WHERE 
+			c.name = ?
+		ORDER BY 
+            p.created_at;
+    `
+	var posts []models.Post
+
+	rows, err := repo.DB.Query(q, userId, userId, categoryName)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var post models.Post
+		var liked bool
+		var disliked bool
+
+		err := rows.Scan(
+			&post.ID,
+			&post.UserId,
+			&post.Title,
+			&post.Content,
+			&post.CreatedAt,
+			&post.CreatedBy,
+			&post.Likes,
+			&post.Category,
+			&post.Dislikes,
+			&liked,
+			&disliked,
+		)
+		if err != nil {
+			return nil, err
+		}
+		post.Liked = liked
+		post.Disliked = disliked
+		posts = append(posts, post)
+	}
+	return posts, nil
+}
