@@ -1,17 +1,29 @@
-INSERT INTO posts (user_id, title, content ,  category_id) VALUES (1, 'Заголовок поста 1', 'Текст поста 1' ,1);
-INSERT INTO posts (user_id, title, content ,  category_id) VALUES (1, 'Заголовок поста 2', 'Текст поста 2' , 2);
-INSERT INTO posts (user_id, title, content, category_id) VALUES (1, 'Заголовок поста 3', 'Текст поста 3',3);
-INSERT INTO posts (user_id, title, content, category_id) VALUES (1, 'Заголовок поста 4', 'Текст поста 4',4);
+-- Добавляем категории
+INSERT INTO categories (name, posts_count) VALUES
+('Technology', 0),
+('Science', 0),
+('Art', 0);
 
-INSERT INTO categories ( name , posts_count) VALUES ('Рандом каотегория',12);
-INSERT INTO categories ( name , posts_count) VALUES ('Аниме',11);
-INSERT INTO categories ( name , posts_count) VALUES ('Видеоигры',1);
-INSERT INTO categories ( name , posts_count) VALUES ('Тачки',123);
+-- Добавляем посты
+INSERT INTO posts (user_id, title, content, category_id, created_at, likes, dislikes) VALUES
+(1, 'First Post', 'Content of the first post', 1, CURRENT_TIMESTAMP, 5, 2),
+(1, 'Second Post', 'Content of the second post', 2, CURRENT_TIMESTAMP, 10, 1),
+(1, 'Third Post', 'Content of the third post', 3, CURRENT_TIMESTAMP, 3, 0);
 
-INSERT INTO comments (post_id, user_id, content, created_at)
-VALUES 
-    (1, 1, 'Это комментарий 1 для поста 1', CURRENT_TIMESTAMP),
-    (1, 1, 'это ответ К комментарию 1', CURRENT_TIMESTAMP),
-    (1, 1, 'это ответ К комментарию 2', CURRENT_TIMESTAMP),
-    (1, 1, 'это ответ К комментарию 3', CURRENT_TIMESTAMP),
-    (1, 1, 'это ответ К ответу комментарию 1 номер 1', CURRENT_TIMESTAMP);
+-- Обновляем счетчики постов в категориях
+UPDATE categories SET posts_count = (SELECT COUNT(*) FROM posts WHERE category_id = categories.id);
+
+-- Добавляем комментарии
+INSERT INTO comments (post_id, user_id, content, created_at, edited, likes, dislikes) VALUES
+(1, 1, 'First comment on first post', CURRENT_TIMESTAMP, FALSE, 2, 0),
+(1, 1, 'Second comment on first post', CURRENT_TIMESTAMP, FALSE, 1, 0),
+(2, 1, 'First comment on second post', CURRENT_TIMESTAMP, FALSE, 0, 1);
+
+-- Добавляем лайки и дизлайки
+INSERT INTO likes_dislikes (user_id, post_id, comment_id, value) VALUES
+(1, 1, NULL, TRUE),  -- Лайк на первый пост
+(1, 2, NULL, TRUE),  -- Лайк на второй пост
+(1, 3, NULL, FALSE), -- Дизлайк на третий пост
+(1, NULL, 1, TRUE),  -- Лайк на первый комментарий первого поста
+(1, NULL, 2, TRUE),  -- Лайк на второй комментарий первого поста
+(1, NULL, 3, FALSE); -- Дизлайк на первый комментарий второго поста

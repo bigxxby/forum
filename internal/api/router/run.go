@@ -78,6 +78,8 @@ func registerAPIRoutes(mux *http.ServeMux, router *Router) {
 	mux.HandleFunc("/api/posts/{id}", middlewares.AuthMiddleware(router.Controller.PostController.GET_post, router.Controller.UserController.UserService))
 	mux.HandleFunc("/api/posts/all", middlewares.AuthMiddleware(router.Controller.PostController.GET_posts, router.Controller.UserController.UserService))
 
+	mux.HandleFunc("/api/posts/{userId}/createdBy", middlewares.AuthMiddleware(router.Controller.PostController.GET_postsCreatedByUser, router.Controller.UserController.UserService))
+
 	mux.HandleFunc("/api/posts/filter/category", middlewares.AuthMiddleware(router.Controller.PostController.GET_postsByCategory, router.Controller.UserController.UserService))
 
 	mux.HandleFunc("/api/posts/liked", middlewares.AuthMiddleware(router.Controller.PostController.GET_likedPosts, router.Controller.UserController.UserService))

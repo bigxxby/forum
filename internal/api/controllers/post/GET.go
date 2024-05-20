@@ -29,6 +29,10 @@ func (c *PostController) GET_post(w http.ResponseWriter, r *http.Request) {
 		httpHelper.InternalServerError(w)
 		return
 	}
+	if post == nil {
+		httpHelper.NotFoundError(w)
+		return
+	}
 	httpHelper.WriteJson(w, 200, post)
 }
 func (c *PostController) GET_posts(w http.ResponseWriter, r *http.Request) {
@@ -57,6 +61,44 @@ func (c *PostController) GET_posts(w http.ResponseWriter, r *http.Request) {
 	httpHelper.WriteJson(w, 200, posts)
 
 }
+
+func (c *PostController) GET_postsCreatedByUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		httpHelper.MethodNotAllowedError(w)
+		return
+	}
+	userId := r.Context().Value("userId")
+	userIdNum, _ := userId.(int)
+
+	byCreatedUser := r.PathValue("userId")
+	if byCreatedUser == "" {
+		httpHelper.BadRequestError(w)
+		return
+	}
+	byCreatedUserNum := httpHelper.GetIdFromString(byCreatedUser)
+	if byCreatedUserNum == -1 {
+		httpHelper.BadRequestError(w)
+		return
+	}
+
+	posts, err := c.PostService.GetAllPostsByUserId(userIdNum, byCreatedUserNum)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			httpHelper.NotFoundError(w)
+			return
+		}
+		log.Println(err.Error())
+		httpHelper.InternalServerError(w)
+		return
+	}
+	if posts == nil {
+		httpHelper.NotFoundError(w)
+		return
+	}
+
+	httpHelper.WriteJson(w, 200, posts)
+
+}
 func (c *PostController) GET_likedPosts(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		httpHelper.MethodNotAllowedError(w)
@@ -77,6 +119,10 @@ func (c *PostController) GET_likedPosts(w http.ResponseWriter, r *http.Request) 
 		}
 		log.Println(err.Error())
 		httpHelper.InternalServerError(w)
+		return
+	}
+	if posts == nil {
+		httpHelper.NotFoundError(w)
 		return
 	}
 
@@ -109,6 +155,10 @@ func (c *PostController) GET_postsByCategory(w http.ResponseWriter, r *http.Requ
 		}
 		log.Println(err.Error())
 		httpHelper.InternalServerError(w)
+		return
+	}
+	if posts == nil {
+		httpHelper.NotFoundError(w)
 		return
 	}
 
