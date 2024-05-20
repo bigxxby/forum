@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"forum/internal/models"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -42,4 +43,15 @@ func (r *UserRepository) CheckUserExistsByLogin(login string) error {
 		return errors.New("user elready exists")
 	}
 	return nil
+}
+func (r *UserRepository) SELECT_user(userId int) (*models.User, error) {
+	q := `
+	SELECT id ,  login , email FROM users WHERE id = ?
+	`
+	var user models.User
+	err := r.db.QueryRow(q, userId).Scan(&user.ID, &user.Login, &user.Email)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

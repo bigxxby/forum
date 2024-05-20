@@ -64,6 +64,7 @@ func registerAPIRoutes(mux *http.ServeMux, router *Router) {
 
 	////GET
 	mux.HandleFunc("/api/users/taken", router.Controller.UserController.GET_CheckIfLoginIsTaken)
+	mux.HandleFunc("/api/profile", middlewares.AuthMiddleware(router.Controller.UserController.GET_MyProfile, router.Controller.UserController.UserService))
 
 	////POST
 	mux.HandleFunc("/api/signUp", router.Controller.UserController.POST_SignUp)
