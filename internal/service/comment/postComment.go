@@ -13,5 +13,6 @@ func (s *CommentService) PostComment(userId, postId int, content string) (int, e
 	if err != nil {
 		return -1, err
 	}
+
 	return commentId, nil
 }

@@ -26,14 +26,10 @@ func (c *PostController) POST_Like(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := c.PostService.LikePost(userIdNum, postIdNum)
+	value, err := c.PostService.LikePost(userIdNum, postIdNum)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			httpHelper.NotFoundError(w)
-			return
-		}
-		if err.Error() == "post already liked" {
-			httpHelper.ConflictError(w)
 			return
 		}
 		log.Println(err.Error())
@@ -41,14 +37,10 @@ func (c *PostController) POST_Like(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpHelper.WriteJson(w, 200, models.DefaultMessage{
-		Message: "Liked :)",
+		Message: value,
 	})
 }
-
-////////
-
-// //
-func (c *PostController) POST_Unlike(w http.ResponseWriter, r *http.Request) {
+func (c *PostController) POST_DisLike(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		httpHelper.MethodNotAllowedError(w)
 		return
@@ -66,10 +58,10 @@ func (c *PostController) POST_Unlike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := c.PostService.UnLikePost(userIdNum, postIdNum)
+	value, err := c.PostService.DisLikePost(userIdNum, postIdNum)
 	if err != nil {
-		if err.Error() == "post not liked" {
-			httpHelper.ConflictError(w)
+		if err == sql.ErrNoRows {
+			httpHelper.NotFoundError(w)
 			return
 		}
 		log.Println(err.Error())
@@ -77,6 +69,6 @@ func (c *PostController) POST_Unlike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpHelper.WriteJson(w, 200, models.DefaultMessage{
-		Message: "UnLiked :(",
+		Message: value,
 	})
 }

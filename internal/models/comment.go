@@ -4,14 +4,14 @@ import "time"
 
 type Comment struct {
 	ID        int       `json:"id"`
-	ParentId  *int      `json:"parentId"`
-	PostID    *int      `json:"post_id"`
-	UserID    int       `json:"user_id"`
+	PostID    *int      `json:"postId"`
+	UserID    int       `json:"userId"`
 	Content   string    `json:"content"`
 	Edited    bool      `json:"edited"`
 	Likes     int       `json:"likes"`
+	Dislikes  int       `json:"dislikes"`
 	Liked     bool      `json:"liked"`
+	Disliked  bool      `json:"disliked"`
 	CreatedBy string    `json:"createdBy"`
-	CreatedAt time.Time `json:"created_at"`
-	Level     int       `json:"level"`
+	CreatedAt time.Time `json:"createdAt"`
 }

@@ -24,7 +24,12 @@ func (c *CommentController) GET_Comments(w http.ResponseWriter, r *http.Request)
 		httpHelper.WriteJson(w, 404, comments)
 		return
 	}
-	httpHelper.WriteJson(w, 404, comments)
+	if comments == nil {
+		httpHelper.NotFoundError(w)
+
+		return
+	}
+	httpHelper.WriteJson(w, 200, comments)
 }
 func (c *CommentController) GET_LikedComments(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
@@ -39,6 +44,11 @@ func (c *CommentController) GET_LikedComments(w http.ResponseWriter, r *http.Req
 		httpHelper.WriteJson(w, 404, comments)
 		return
 	}
-	httpHelper.WriteJson(w, 404, comments)
+	if comments == nil {
+		httpHelper.NotFoundError(w)
+
+		return
+	}
+	httpHelper.WriteJson(w, 200, comments)
 
 }
