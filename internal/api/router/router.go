@@ -13,8 +13,9 @@ type Router struct {
 }
 
 func NewRouter(connection *sql.DB) *Router {
-	controller := controllers.NewController(service.NewService(repository.NewRepository(connection)))
-	html := controllers.NewHTMLController(connection)
+	repo := repository.NewRepository(connection)
+	controller := controllers.NewController(service.NewService(repo))
+	html := controllers.NewHTMLController(repo)
 	return &Router{
 		Controller:     controller,
 		HTMLController: html,

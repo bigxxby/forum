@@ -56,6 +56,17 @@ func registerHTMLRoutes(mux *http.ServeMux, router *Router) {
 	mux.HandleFunc("/", router.HTMLController.GET_HTML_Index)
 	mux.HandleFunc("/signUp", router.HTMLController.GET_HTML_SignUp)
 	mux.HandleFunc("/signIn", router.HTMLController.GET_HTML_SignIn)
+	mux.HandleFunc("/posts", router.HTMLController.GET_HTML_Posts)
+	mux.HandleFunc("/posts/", router.HTMLController.GET_HTML_Post)
+
+	mux.HandleFunc("/posts/create", router.HTMLController.GET_HTML_Post)
+
+	// mux.HandleFunc("/signIn", router.HTMLController.GET_HTML_SignIn)
+	// mux.HandleFunc("/signIn", router.HTMLController.GET_HTML_SignIn)
+	// mux.HandleFunc("/signIn", router.HTMLController.GET_HTML_SignIn)
+	// mux.HandleFunc("/signIn", router.HTMLController.GET_HTML_SignIn)
+	// mux.HandleFunc("/signIn", router.HTMLController.GET_HTML_SignIn)
+	// mux.HandleFunc("/signIn", router.HTMLController.GET_HTML_SignIn)
 }
 
 // registerAPIRoutes регистрирует маршруты для API

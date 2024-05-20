@@ -1,18 +1,18 @@
 package controllers
 
 import (
-	"database/sql"
+	"forum/internal/repository"
 	"forum/pkg/httpHelper"
 	"net/http"
 )
 
 type HTMLController struct {
-	DB *sql.DB
+	Repo *repository.Repository
 }
 
-func NewHTMLController(connection *sql.DB) *HTMLController {
+func NewHTMLController(r *repository.Repository) *HTMLController {
 	return &HTMLController{
-		DB: connection,
+		Repo: r,
 	}
 }
 
@@ -50,4 +50,35 @@ func (c *HTMLController) GET_HTML_SignIn(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	httpHelper.RenderHTMLPage(w, "web/ui/templates/signIn.html", nil)
+}
+func (c *HTMLController) GET_HTML_Posts(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		httpHelper.ParseHTMLError(w, http.StatusMethodNotAllowed, "Method is not allowed, what are you trying to do? :}")
+		return
+	}
+	httpHelper.RenderHTMLPage(w, "web/ui/templates/posts.html", nil)
+}
+func (c *HTMLController) GET_HTML_Post(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		httpHelper.ParseHTMLError(w, http.StatusMethodNotAllowed, "Method is not allowed, what are you trying to do? :}")
+		return
+	}
+	uuid, err := r.Cookie("uuid")
+	if err != nil {
+		httpHelper.ParseHTMLError(w, http.StatusUnauthorized, "Unathorised, LOGIN FIRST!!!")
+		return
+	}
+
+	user, err := c.Repo.UserRepository.GetUserByUUID(uuid.Value)
+	if err != nil {
+		if err != nil {
+			httpHelper.ParseHTMLError(w, http.StatusUnauthorized, "Unathorised, LOGIN FIRST!!!")
+			return
+		}
+	}
+	if user == nil {
+		httpHelper.ParseHTMLError(w, http.StatusUnauthorized, "Unathorised, LOGIN FIRST!!!")
+		return
+	}
+	httpHelper.RenderHTMLPage(w, "web/ui/templates/createPost.html", nil)
 }
