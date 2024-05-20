@@ -28,5 +28,9 @@ func (c *CategoryController) GET_categories(w http.ResponseWriter, r *http.Reque
 		return
 
 	}
+	if categories == nil {
+		httpHelper.NotFoundError(w)
+		return
+	}
 	httpHelper.WriteJson(w, 200, categories)
 }
