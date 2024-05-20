@@ -28,7 +28,7 @@ func Run() {
 	registerAPIRoutes(mux, router)
 
 	// Статические файлы
-	registerStaticRoutes()
+	registerStaticRoutes(mux)
 
 	log.Println("Server started at http://localhost:8080/")
 	http.ListenAndServe(":8080", mux)
@@ -114,8 +114,8 @@ func registerAPIRoutes(mux *http.ServeMux, router *Router) {
 }
 
 // registerStaticRoutes регистрирует маршруты для статических файлов
-func registerStaticRoutes() {
+func registerStaticRoutes(mux *http.ServeMux) {
 	staticDir := "/static/"
 	staticFileServer := http.StripPrefix(staticDir, http.FileServer(http.Dir("web/ui/static")))
-	http.Handle(staticDir, staticFileServer)
+	mux.Handle(staticDir, staticFileServer)
 }
