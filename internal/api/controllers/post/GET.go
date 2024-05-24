@@ -46,8 +46,9 @@ func (c *PostController) GET_posts(w http.ResponseWriter, r *http.Request) {
 	}
 	userId := r.Context().Value("userId")
 	userIdNum, _ := userId.(int)
+	filterBy := r.URL.Query().Get("filter")
 
-	posts, err := c.PostService.GetAllPostsByCreationTime(userIdNum)
+	posts, err := c.PostService.GetAllPosts(userIdNum, filterBy)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			httpHelper.NotFoundError(w)
@@ -147,7 +148,9 @@ func (c *PostController) GET_postsByCategory(w http.ResponseWriter, r *http.Requ
 		httpHelper.BadRequestError(w)
 		return
 	}
-	posts, err := c.PostService.GetAllPostsByCategory(categoryName, userIdNum)
+	filterBy := r.URL.Query().Get("filter")
+
+	posts, err := c.PostService.GetAllPostsByCategory(categoryName, userIdNum, filterBy)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			httpHelper.NotFoundError(w)
