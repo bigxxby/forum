@@ -10,6 +10,7 @@ import (
 
 // Run запускает HTTP сервер
 func Run() {
+	log.SetFlags(log.Lshortfile | log.LstdFlags)
 	connection, err := setupDatabase()
 	if err != nil {
 		log.Println(err)
@@ -31,7 +32,11 @@ func Run() {
 	registerStaticRoutes(mux)
 
 	log.Println("Server started at http://localhost:8080/")
-	http.ListenAndServe(":8080", mux)
+	err = http.ListenAndServe(":8080", mux)
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
 }
 
 // setupDatabase инициализирует базу данных

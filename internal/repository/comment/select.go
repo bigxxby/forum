@@ -16,19 +16,22 @@ func (repo *CommentRepo) SELECT_Comments(postId int, userId int) ([]models.Comme
         c.likes, 
         c.dislikes, 
         c.created_at, 
-        CASE WHEN l.user_id IS NOT NULL THEN true ELSE false END AS liked
+        CASE WHEN l1.user_id IS NOT NULL THEN true ELSE false END AS liked,
+        CASE WHEN l2.user_id IS NOT NULL THEN true ELSE false END AS disliked
     FROM 
         comments c 
     LEFT JOIN 
         users u ON u.id = c.user_id
     LEFT JOIN 
-        likes_dislikes l ON l.user_id = ? AND c.id = l.comment_id AND l.value = true -- Лайки
-    WHERE 
-        c.post_id = ?
+        likes_dislikes l1 ON l1.user_id = ? AND c.id = l1.comment_id AND l1.value = true -- Лайки
+	LEFT JOIN 
+		likes_dislikes l2 ON l2.user_id = ? AND c.id = l2.comment_id AND l2.value = false -- дизы
+	WHERE 
+	c.post_id = ?
     ORDER BY 
         c.created_at DESC
     `
-	rows, err := repo.DB.Query(q, userId, postId)
+	rows, err := repo.DB.Query(q, userId, userId, postId)
 	if err != nil {
 		return nil, err
 	}
@@ -48,6 +51,7 @@ func (repo *CommentRepo) SELECT_Comments(postId int, userId int) ([]models.Comme
 			&comment.Dislikes,
 			&comment.CreatedAt,
 			&comment.Liked,
+			&comment.Disliked,
 		)
 		if err != nil {
 			return nil, err
