@@ -15,7 +15,7 @@ func (c *CommentController) POST_Comment(w http.ResponseWriter, r *http.Request)
 		httpHelper.MethodNotAllowedError(w)
 		return
 	}
-	postId := httpHelper.GetIdFromString(r.PathValue("id"))
+	postId := httpHelper.GetIdFromString(r.URL.Query().Get("valueId"))
 	if postId == -1 {
 		httpHelper.BadRequestError(w)
 		return
@@ -57,14 +57,14 @@ func (c *CommentController) POST_Comment(w http.ResponseWriter, r *http.Request)
 		Message: "Comment Created :)",
 		Id:      commentId,
 	})
-
 }
+
 func (c *CommentController) POST_Like(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		httpHelper.MethodNotAllowedError(w)
 		return
 	}
-	commentId := httpHelper.GetIdFromString(r.PathValue("id"))
+	commentId := httpHelper.GetIdFromString(r.URL.Query().Get("valueId"))
 	if commentId == -1 {
 		httpHelper.BadRequestError(w)
 		return
@@ -89,12 +89,13 @@ func (c *CommentController) POST_Like(w http.ResponseWriter, r *http.Request) {
 		Message: value,
 	})
 }
+
 func (c *CommentController) POST_DisLike(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		httpHelper.MethodNotAllowedError(w)
 		return
 	}
-	commentId := httpHelper.GetIdFromString(r.PathValue("id"))
+	commentId := httpHelper.GetIdFromString(r.URL.Query().Get("valueId"))
 	if commentId == -1 {
 		httpHelper.BadRequestError(w)
 		return

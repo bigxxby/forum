@@ -82,13 +82,13 @@ func registerAPIRoutes(mux *http.ServeMux, router *Router) {
 	// Post API
 	////POST
 	mux.HandleFunc("/api/posts", middlewares.AuthMiddleware(router.Controller.PostController.POST_PostPost, router.Controller.UserController.UserService))
-	mux.HandleFunc("/api/posts/{id}/like", middlewares.AuthMiddleware(router.Controller.PostController.POST_Like, router.Controller.UserController.UserService))
-	mux.HandleFunc("/api/posts/{id}/dislike", middlewares.AuthMiddleware(router.Controller.PostController.POST_DisLike, router.Controller.UserController.UserService))
+	mux.HandleFunc("/api/posts/like", middlewares.AuthMiddleware(router.Controller.PostController.POST_Like, router.Controller.UserController.UserService))       // query ?valueId=number
+	mux.HandleFunc("/api/posts/dislike", middlewares.AuthMiddleware(router.Controller.PostController.POST_DisLike, router.Controller.UserController.UserService)) // query ?valueId=number
 	////GET
-	mux.HandleFunc("/api/posts/{id}", middlewares.AuthMiddleware(router.Controller.PostController.GET_post, router.Controller.UserController.UserService))
+	mux.HandleFunc("/api/posts/one", middlewares.AuthMiddleware(router.Controller.PostController.GET_post, router.Controller.UserController.UserService)) // query ?valueId=number
 	mux.HandleFunc("/api/posts/all", middlewares.AuthMiddleware(router.Controller.PostController.GET_posts, router.Controller.UserController.UserService))
 
-	mux.HandleFunc("/api/posts/{userId}/createdBy", middlewares.AuthMiddleware(router.Controller.PostController.GET_postsCreatedByUser, router.Controller.UserController.UserService))
+	mux.HandleFunc("/api/posts/createdBy", middlewares.AuthMiddleware(router.Controller.PostController.GET_postsCreatedByUser, router.Controller.UserController.UserService)) // query ?valueId=number
 
 	mux.HandleFunc("/api/posts/filter/category", middlewares.AuthMiddleware(router.Controller.PostController.GET_postsByCategory, router.Controller.UserController.UserService))
 
@@ -96,15 +96,15 @@ func registerAPIRoutes(mux *http.ServeMux, router *Router) {
 
 	// Comment API
 	////POST
-	mux.HandleFunc("/api/comments/{id}/post", middlewares.AuthMiddleware(router.Controller.CommentController.POST_Comment, router.Controller.UserController.UserService))
-	mux.HandleFunc("/api/comments/{id}/like", middlewares.AuthMiddleware(router.Controller.CommentController.POST_Like, router.Controller.UserController.UserService))
-	mux.HandleFunc("/api/comments/{id}/dislike", middlewares.AuthMiddleware(router.Controller.CommentController.POST_DisLike, router.Controller.UserController.UserService))
-	mux.HandleFunc("/api/comments/{id}/edit", middlewares.AuthMiddleware(router.Controller.CommentController.PUT_EditComment, router.Controller.UserController.UserService))
+	mux.HandleFunc("/api/comments/post", middlewares.AuthMiddleware(router.Controller.CommentController.POST_Comment, router.Controller.UserController.UserService))    // query ?valueId=number
+	mux.HandleFunc("/api/comments/like", middlewares.AuthMiddleware(router.Controller.CommentController.POST_Like, router.Controller.UserController.UserService))       // query ?valueId=number
+	mux.HandleFunc("/api/comments/dislike", middlewares.AuthMiddleware(router.Controller.CommentController.POST_DisLike, router.Controller.UserController.UserService)) // query ?valueId=number
+	mux.HandleFunc("/api/comments/edit", middlewares.AuthMiddleware(router.Controller.CommentController.PUT_EditComment, router.Controller.UserController.UserService)) // query ?valueId=number
 	////DELETE
-	mux.HandleFunc("/api/comments/{id}/delete", middlewares.AuthMiddleware(router.Controller.CommentController.DELETE_Comment, router.Controller.UserController.UserService))
+	mux.HandleFunc("/api/comments/delete", middlewares.AuthMiddleware(router.Controller.CommentController.DELETE_Comment, router.Controller.UserController.UserService)) // query ?valueId=number
 	////GET
 	mux.HandleFunc("/api/comments/liked", middlewares.AuthMiddleware(router.Controller.CommentController.GET_LikedComments, router.Controller.UserController.UserService))
-	mux.HandleFunc("/api/comments/{postId}", middlewares.AuthMiddleware(router.Controller.CommentController.GET_Comments, router.Controller.UserController.UserService))
+	mux.HandleFunc("/api/comments", middlewares.AuthMiddleware(router.Controller.CommentController.GET_Comments, router.Controller.UserController.UserService)) // query ?valueId=number
 
 	// Category API
 	////GET

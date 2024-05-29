@@ -13,7 +13,7 @@ func (c *CommentController) DELETE_Comment(w http.ResponseWriter, r *http.Reques
 		httpHelper.MethodNotAllowedError(w)
 		return
 	}
-	commentId := httpHelper.GetIdFromString(r.PathValue("id"))
+	commentId := httpHelper.GetIdFromString(r.URL.Query().Get("valueId"))
 	if commentId == -1 {
 		httpHelper.BadRequestError(w)
 		return
@@ -38,5 +38,4 @@ func (c *CommentController) DELETE_Comment(w http.ResponseWriter, r *http.Reques
 	httpHelper.WriteJson(w, 200, models.DefaultMessage{
 		Message: "Comment Deleted :(",
 	})
-
 }

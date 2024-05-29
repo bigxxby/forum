@@ -1,6 +1,6 @@
 module forum
 
-go 1.22.2
+go 1.20
 
 require (
 	github.com/gofrs/uuid v4.4.0+incompatible

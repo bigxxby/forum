@@ -11,7 +11,7 @@ func (c *CommentController) GET_Comments(w http.ResponseWriter, r *http.Request)
 		httpHelper.MethodNotAllowedError(w)
 		return
 	}
-	postId := httpHelper.GetIdFromString(r.PathValue("postId"))
+	postId := httpHelper.GetIdFromString(r.URL.Query().Get("valueId"))
 	if postId == -1 {
 		httpHelper.BadRequestError(w)
 		return
@@ -31,6 +31,7 @@ func (c *CommentController) GET_Comments(w http.ResponseWriter, r *http.Request)
 	}
 	httpHelper.WriteJson(w, 200, comments)
 }
+
 func (c *CommentController) GET_LikedComments(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		httpHelper.MethodNotAllowedError(w)
@@ -50,5 +51,4 @@ func (c *CommentController) GET_LikedComments(w http.ResponseWriter, r *http.Req
 		return
 	}
 	httpHelper.WriteJson(w, 200, comments)
-
 }

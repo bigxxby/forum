@@ -13,7 +13,7 @@ func (c *PostController) POST_Like(w http.ResponseWriter, r *http.Request) {
 		httpHelper.MethodNotAllowedError(w)
 		return
 	}
-	postId := r.PathValue("id")
+	postId := r.URL.Query().Get("valueId")
 	postIdNum := httpHelper.GetIdFromString(postId)
 	if postIdNum == -1 {
 		httpHelper.BadRequestError(w)
@@ -40,12 +40,13 @@ func (c *PostController) POST_Like(w http.ResponseWriter, r *http.Request) {
 		Message: value,
 	})
 }
+
 func (c *PostController) POST_DisLike(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		httpHelper.MethodNotAllowedError(w)
 		return
 	}
-	postId := r.PathValue("id")
+	postId := r.URL.Query().Get("valueId")
 	postIdNum := httpHelper.GetIdFromString(postId)
 	if postIdNum == -1 {
 		httpHelper.BadRequestError(w)

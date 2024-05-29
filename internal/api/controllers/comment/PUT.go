@@ -16,7 +16,7 @@ func (c *CommentController) PUT_EditComment(w http.ResponseWriter, r *http.Reque
 		httpHelper.MethodNotAllowedError(w)
 		return
 	}
-	commentId := httpHelper.GetIdFromString(r.PathValue("id"))
+	commentId := httpHelper.GetIdFromString(r.URL.Query().Get("valueId"))
 	if commentId == -1 {
 		httpHelper.BadRequestError(w)
 		return
@@ -62,5 +62,4 @@ func (c *CommentController) PUT_EditComment(w http.ResponseWriter, r *http.Reque
 	httpHelper.WriteJson(w, 200, models.DefaultMessage{
 		Message: "Comment edited :)",
 	})
-
 }

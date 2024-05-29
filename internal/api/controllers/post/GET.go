@@ -12,7 +12,7 @@ func (c *PostController) GET_post(w http.ResponseWriter, r *http.Request) {
 		httpHelper.MethodNotAllowedError(w)
 		return
 	}
-	postId := httpHelper.GetIdFromString(r.PathValue("id"))
+	postId := httpHelper.GetIdFromString(r.URL.Query().Get("valueId"))
 	if postId == -1 {
 		httpHelper.BadRequestError(w)
 		return
@@ -35,6 +35,7 @@ func (c *PostController) GET_post(w http.ResponseWriter, r *http.Request) {
 	}
 	httpHelper.WriteJson(w, 200, post)
 }
+
 func (c *PostController) GET_posts(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		httpHelper.MethodNotAllowedError(w)
@@ -60,7 +61,6 @@ func (c *PostController) GET_posts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	httpHelper.WriteJson(w, 200, posts)
-
 }
 
 func (c *PostController) GET_postsCreatedByUser(w http.ResponseWriter, r *http.Request) {
@@ -71,7 +71,7 @@ func (c *PostController) GET_postsCreatedByUser(w http.ResponseWriter, r *http.R
 	userId := r.Context().Value("userId")
 	userIdNum, _ := userId.(int)
 
-	byCreatedUser := r.PathValue("userId")
+	byCreatedUser := r.URL.Query().Get("valueId")
 	if byCreatedUser == "" {
 		httpHelper.BadRequestError(w)
 		return
@@ -98,8 +98,8 @@ func (c *PostController) GET_postsCreatedByUser(w http.ResponseWriter, r *http.R
 	}
 
 	httpHelper.WriteJson(w, 200, posts)
-
 }
+
 func (c *PostController) GET_likedPosts(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		httpHelper.MethodNotAllowedError(w)
@@ -128,8 +128,8 @@ func (c *PostController) GET_likedPosts(w http.ResponseWriter, r *http.Request) 
 	}
 
 	httpHelper.WriteJson(w, 200, posts)
-
 }
+
 func (c *PostController) GET_postsByCategory(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		httpHelper.MethodNotAllowedError(w)
@@ -166,5 +166,4 @@ func (c *PostController) GET_postsByCategory(w http.ResponseWriter, r *http.Requ
 	}
 
 	httpHelper.WriteJson(w, 200, posts)
-
 }
