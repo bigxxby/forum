@@ -31,8 +31,11 @@ func Run() {
 	// Статические файлы
 	registerStaticRoutes(mux)
 
+	// Оборачиваем mux в логирующее middleware
+	loggedMux := middlewares.LoggingMiddleware(mux)
+
 	log.Println("Server started at http://localhost:8080/")
-	err = http.ListenAndServe(":8080", mux)
+	err = http.ListenAndServe(":8080", loggedMux)
 	if err != nil {
 		log.Println(err.Error())
 		return
@@ -78,6 +81,7 @@ func registerAPIRoutes(mux *http.ServeMux, router *Router) {
 	////POST
 	mux.HandleFunc("/api/signUp", router.Controller.UserController.POST_SignUp)
 	mux.HandleFunc("/api/signIn", router.Controller.UserController.POST_SignIn)
+	mux.HandleFunc("/api/logout", router.Controller.UserController.POST_Logout)
 
 	// Post API
 	////POST

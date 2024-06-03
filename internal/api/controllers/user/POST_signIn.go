@@ -64,3 +64,24 @@ func (m *UserController) POST_SignIn(w http.ResponseWriter, r *http.Request) {
 		UUID:    uuid,
 	})
 }
+
+func (m *UserController) POST_Logout(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		httpHelper.MethodNotAllowedError(w)
+		return
+	}
+	if r.URL.Path != "/api/logout" {
+		httpHelper.NotFoundError(w)
+		return
+	}
+	cookie := http.Cookie{
+		Name:     "uuid",
+		Value:    "",
+		MaxAge:   -1,
+		HttpOnly: true,
+
+		Path: "/",
+	}
+	http.SetCookie(w, &cookie)
+	httpHelper.WriteJson(w, http.StatusOK, "Logged out :)")
+}
