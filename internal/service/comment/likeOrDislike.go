@@ -5,6 +5,13 @@ func (s *CommentService) LikeOrUnlikeComment(userId int, commentId int) (string,
 	if err != nil {
 		return "", err
 	}
+	disliked, err := s.LikeRepo.SELECT_alreadyDisLikedComment(userId, commentId)
+	if err != nil {
+		return "", err
+	}
+	if disliked {
+		s.DisLikeOrUnDislikeComment(userId, commentId)
+	}
 
 	if !liked {
 		err = s.CommentRepo.UPDATE_like(commentId, true)
@@ -38,6 +45,13 @@ func (s *CommentService) DisLikeOrUnDislikeComment(userId int, commentId int) (s
 	disliked, err := s.LikeRepo.SELECT_alreadyDisLikedComment(userId, commentId)
 	if err != nil {
 		return "", err
+	}
+	liked, err := s.LikeRepo.SELECT_alreadyLikedComment(userId, commentId)
+	if err != nil {
+		return "", err
+	}
+	if liked {
+		s.LikeOrUnlikeComment(userId, commentId)
 	}
 
 	if !disliked {

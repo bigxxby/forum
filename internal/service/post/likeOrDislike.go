@@ -6,6 +6,13 @@ func (s *PostService) LikePost(userId, postId int) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	disliked, err := s.LikesRepo.SELECT_alreadyDisLikedPost(userId, postId)
+	if err != nil {
+		return "", err
+	}
+	if disliked {
+		s.DisLikePost(userId, postId)
+	}
 
 	if !liked {
 		err = s.PostRepository.UPDATE_like(postId, true)
@@ -39,7 +46,14 @@ func (s *PostService) DisLikePost(userId, postId int) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	liked, err := s.LikesRepo.SELECT_alreadyLikedPost(userId, postId)
+	if err != nil {
+		return "", err
 
+	}
+	if liked {
+		s.LikePost(userId, postId)
+	}
 	if !disliked {
 		err = s.PostRepository.UPDATE_dislike(postId, true)
 		if err != nil {
