@@ -4,13 +4,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="static/css/signIn.css">
+    <link rel="stylesheet" href="static/css/signUp.css">
     <title>Sign In</title>
 </head>
-<script src="static/script/common.js"></script>
 
 <body>
-    this is sign in
+    <div class="Head">
+        <ul>
+            <li onclick="window.location.href = 'http://localhost:8080/'">Forum</li>
+            <li>Contacts</li>
+        </ul>
+    </div>
+
+    <div class="contentArea">
+        <div class="contentHead">
+            <h1>Forum</h1>
+        </div>
+        <div class="content">
+            <form action="" method="post" autocomplete="off" id="signInForm">
+                <div id="errorMessage"></div>
+                <input class="input_text" type="text" name="email" id="email" placeholder="   Email" maxlength="30" required>
+                <input type="password" name="password" id="password" placeholder="   Password" maxlength="20" required>
+                <input type="submit" id="submitBtn" value="SUBMIT"></input>
+                <a id="direct" href="http://localhost:8080/signUp">I don't have account</a>
+            </form>
+        </div>
+    </div>
+    <script src="static/script/signIn.js"></script>
 </body>
 
 </html>

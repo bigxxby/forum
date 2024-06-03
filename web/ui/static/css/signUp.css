@@ -1,5 +1,79 @@
-
-
 body {
-    background-color: aquamarine;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+}
+/*  верхняя часть! */
+.Head{
+    background-color: blue;
+    width: 100vw;
+    height: 70px;
+    display: flex;
+}
+.Head > ul{
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    color: white;
+    font-size: 20pt;
+    margin: auto 0;
+}
+li{
+    display: block;
+    cursor: pointer;
+}
+#direct{
+    margin: 10px 0;
+}
+/* сам контент */
+.contentArea{
+    width: 500px;
+    margin: 0 auto;
+    margin-top: 5%;
+    border: 1px solid grey;
+    padding-top: 15px;
+}
+.contentHead{
+    background-color: blue;
+    height: 100px;
+    color: white;
+    text-align: center;
+}
+.contentHead > h1{
+    padding-top: 20px;
+}
+#errorMessage{
+    color: red;
+    height: 40px;
+    font-style: italic;
+}
+form{
+    width: 80%;
+    margin: 0 auto;
+    margin-top: 10%;
+    display: flex;
+    flex-direction: column;
+}
+form>input{
+    height: 40px;
+    margin-bottom: 10px;
+    border-radius: 15px;
+}
+#submitBtn{
+    margin-top: 10px;
+}
+#succesPage{
+    display: none;
+    text-align: center;
+    margin-top: 100px;
+    font-size: 14pt;
+    color: blue;
+}
+#succesPage>button{
+    width: 50%;
+    height: 50px;
+    font-size: 14pt;
+    font-weight: bold;
+    color: white;
+    background-color: blue;
 }

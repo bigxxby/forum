@@ -7,10 +7,124 @@
     <link rel="stylesheet" href="static/css/index.css">
     <title>Index</title>
 </head>
-<script src="static/script/common.js"></script>
 
 <body>
-    Hello world
+    <div class="Head">
+        <ul id="headList">
+            <li id="homeBtn" data-section="home" onclick="changePage(event)">Forum</li>
+            <li id="ProfileBtn" data-section="profile" onclick="changePage(event)">Profile</li>
+            <li id="contactsBtn" data-section="contacts" onclick="changePage(event)">Contacts</li>
+        </ul>
+    </div>
+
+    <div class="homePage" id="homePage">
+        <div class="addPost" id="addPost">
+            <button id = "newPostBtn" onclick="toggleDiv(`newPostForm`)">Create a new post</button>
+            <div class="newPostArea">
+                <form action=""  autocomplete="off" id="newPostForm">
+                    <!-- <div id="errorMessage"></div> -->
+                    <input class="input_text" type="text" name="TitlePost" id="TitlePost" placeholder="   Title" maxlength="40" required>
+                    <!-- <input type="text" name="contentPost" id="contentPost" placeholder="   Content" maxlength="40" required> -->
+                    <textarea name="contentPost" id="contentPost"  placeholder=" Content" maxlength="150" required></textarea>
+                    <select name="selectCategoryPost" id="selectCategoryPost" required>
+                        <option value="none" disabled > Select category</option>
+                        <option value="Technology"> Technology</option>
+                        <option value="Science"> Science</option>
+                        <option value="Art"> Art</option>
+                    </select>                    
+                    <input type="submit" id="sendPost" value="Send"></input>
+                </form>
+            </div>
+        </div>
+
+        <div class="filterArea centerBlock" id="filterArea">
+            <b>Apply filter: </b>
+            <select name="selectFilterPost" id="selectFilterPost" onchange="handleSelectChange()">
+                <option value="none" disabled > Select Filter</option>
+                <option value="all"> All posts</option>
+                <option value="liked"> by number of likes</option>
+                <option value="disliked"> by number of dislikes</option>
+                <option value="none" disabled > Select category</option>
+                <option value="Technology"> Technology</option>
+                <option value="Science"> Science</option>
+                <option value="Art"> Art</option>
+
+            </select>  
+        </div>
+
+        <div class="postContainer" id="postContainer">
+        
+        </div>
+    </div>
+
+    <div class="profilePage" id="profilePage">
+        <div id="profileInfo" class="centerBlock">
+    
+        </div>
+
+        <div id="myPosts">
+            <h3 style="text-align: center;">My posts</h3>
+        </div>
+
+        <div id="likedPosts">
+            <h3 style="text-align: center;">Liked posts</h3>
+        </div>
+
+    </div>
+
+    <div id="contactsPage">
+        <div class="centerBlock Contacts">
+            <h3>Authrors</h3> <br>
+            <i>Bigxxby</i><br>
+            <i>dumitkal</i>
+        </div>
+    </div>
+    <script src="static/script/mainPage.js"></script>
 </body>
 
 </html>
+
+
+
+<!-- структура поста -->
+<!-- <div class="post">
+            <div class="postHead">
+                Username <br>
+                Created Time
+            </div>
+            <h3>Title</h3>
+            <h4>content</h4>
+            <i>category</i> 
+            <div class="postBottom">
+                <div class="reactionBtns" id="likeButton">
+                    <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" transform="matrix(1, 0, 0, -1, 0, 0)">
+                        <g id="SVGструктура постаRepo_bgCarrier" stroke-width="0"/>
+                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                        <g id="SVGRepo_iconCarrier"> 
+                            <path d="M20.2699 8.48505L20.9754 12.5648C21.1516 13.5838 20.368 14.5158 19.335 14.5158H14.1539C13.6404 14.5158 13.2494 14.9767 13.3325 15.484L13.9952 19.5286C14.1028 20.1857 14.0721 20.858 13.9049 21.5025C13.7664 22.0364 13.3545 22.465 12.8128 22.6391L12.6678 22.6856C12.3404 22.7908 11.9831 22.7663 11.6744 22.6176C11.3347 22.4539 11.0861 22.1553 10.994 21.8001L10.5183 19.9663C10.3669 19.3828 10.1465 18.8195 9.86218 18.2874C9.44683 17.5098 8.80465 16.8875 8.13711 16.3123L6.69838 15.0725C6.29272 14.7229 6.07968 14.1994 6.12584 13.6656L6.93801 4.27293C7.0125 3.41139 7.7328 2.75 8.59658 2.75H13.2452C16.7265 2.75 19.6975 5.17561 20.2699 8.48505Z" fill="currentColor"/> 
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M2.96767 15.2651C3.36893 15.2824 3.71261 14.9806 3.74721 14.5804L4.71881 3.34389C4.78122 2.6221 4.21268 2 3.48671 2C2.80289 2 2.25 2.55474 2.25 3.23726V14.5158C2.25 14.9174 2.5664 15.2478 2.96767 15.2651Z" fill="currentColor"/> 
+                        </g>
+                    </svg>
+                    <span>count</span>
+                </div>
+                <div class="reactionBtns" id="dislikeButton">
+                    <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                        <g id="SVGRepo_iconCarrier">
+                            <path d="M20.2699 8.48505L20.9754 12.5648C21.1516 13.5838 20.368 14.5158 19.335 14.5158H14.1539C13.6404 14.5158 13.2494 14.9767 13.3325 15.484L13.9952 19.5286C14.1028 20.1857 14.0721 20.858 13.9049 21.5025C13.7664 22.0364 13.3545 22.465 12.8128 22.6391L12.6678 22.6856C12.3404 22.7908 11.9831 22.7663 11.6744 22.6176C11.3347 22.4539 11.0861 22.1553 10.994 21.8001L10.5183 19.9663C10.3669 19.3828 10.1465 18.8195 9.86218 18.2874C9.44683 17.5098 8.80465 16.8875 8.13711 16.3123L6.69838 15.0725C6.29272 14.7229 6.07968 14.1994 6.12584 13.6656L6.93801 4.27293C7.0125 3.41139 7.7328 2.75 8.59658 2.75H13.2452C16.7265 2.75 19.6975 5.17561 20.2699 8.48505Z" fill="currentColor"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M2.96767 15.2651C3.36893 15.2824 3.71261 14.9806 3.74721 14.5804L4.71881 3.34389C4.78122 2.6221 4.21268 2 3.48671 2C2.80289 2 2.25 2.55474 2.25 3.23726V14.5158C2.25 14.9174 2.5664 15.2478 2.96767 15.2651Z" fill="currentColor"/>
+                        </g>
+                    </svg>
+                    <span>count</span>
+                </div>
+                <div class="reactionBtns" id="commentsButton">
+                    <svg width="40px" height="40px" viewBox="0 -0.5 25 25" fill="white" xmlns="http://www.w3.org/2000/svg">
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>              
+                        <g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M18.1 5.00016H6.9C6.53425 4.99455 6.18126 5.13448 5.9187 5.38917C5.65614 5.64385 5.50553 5.99242 5.5 6.35816V14.5002C5.50553 14.8659 5.65614 15.2145 5.9187 15.4692C6.18126 15.7238 6.53425 15.8638 6.9 15.8582H10.77C10.9881 15.857 11.2035 15.9056 11.4 16.0002L17.051 19.0002L17 14.5002H18.43C19.0106 14.5091 19.4891 14.0467 19.5 13.4662V6.35816C19.4945 5.99242 19.3439 5.64385 19.0813 5.38917C18.8187 5.13448 18.4657 4.99455 18.1 5.00016Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.5 8.25024C8.08579 8.25024 7.75 8.58603 7.75 9.00024C7.75 9.41446 8.08579 9.75024 8.5 9.75024V8.25024ZM16.5 9.75024C16.9142 9.75024 17.25 9.41446 17.25 9.00024C17.25 8.58603 16.9142 8.25024 16.5 8.25024V9.75024ZM8.5 11.2502C8.08579 11.2502 7.75 11.586 7.75 12.0002C7.75 12.4145 8.08579 12.7502 8.5 12.7502V11.2502ZM14.5 12.7502C14.9142 12.7502 15.25 12.4145 15.25 12.0002C15.25 11.586 14.9142 11.2502 14.5 11.2502V12.7502ZM8.5 9.75024H16.5V8.25024H8.5V9.75024ZM8.5 12.7502H14.5V11.2502H8.5V12.7502Z" fill="currentColor"/> </g>        
+                        </svg>
+                    <span>count</span>
+                </div>
+            </div>
+        </div> -->

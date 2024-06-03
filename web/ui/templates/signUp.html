@@ -7,10 +7,39 @@
     <link rel="stylesheet" href="static/css/signUp.css">
     <title>Sign Up</title>
 </head>
-<script src="static/script/common.js"></script>
 
 <body>
-    this is sign up
+    <div class="Head">
+        <ul>
+            <li onclick="window.location.href = 'http://localhost:8080/'">Forum</li>
+            <li>Contacts</li>
+        </ul>
+    </div>
+
+    <div class="contentArea">
+        <div class="contentHead">
+            <h1>Forum</h1>
+        </div>
+        <div class="content">
+            <form action="" method="post" autocomplete="off" id="authorizationForm">
+                <div id="errorMessage"></div>
+                <input class="input_text" type="text" name="username" , id="username" placeholder="   Username" maxlength="20" required>
+                <input class="input_text" type="password" name="password" id="password" placeholder="   Password" maxlength="20" required>
+                <input class="input_text" type="password" name="repass" id="confirmPassword" placeholder="   Repeat password" maxlength="20" required>
+                <input class="input_text" type="text" name="email" id="email" placeholder="   Email" maxlength="30" required>
+                <input class="input_text" type="submit" id="submitBtn" value="SUBMIT"></input>
+                <a id="direct" href="http://localhost:8080/signIn">I have account</a>
+            </form>
+
+            <div id="succesPage">
+                <h3>Registration completed successfully.</h3>
+                <button onclick='window.location.href ="http://localhost:8080/signIn"'>Go to login page</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/script/registration.js"></script>
+
 </body>
 
 </html>
