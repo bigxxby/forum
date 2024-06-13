@@ -1,14 +1,19 @@
+:root {
+    --mainBlue: #505B79;
+    --mainLight: #DCB98D;
+    --secondLight: #F8F2EA;
+  }
+
 body {
     margin: 0;
     padding: 0;
 }
 /*  верхняя часть! */
 .Head{
-    background-color: blue;
+    background-color: var(--mainBlue);
     width: 100vw;
     height: 70px;
     display: flex;
-    
 }
 .Head > ul{
     display: flex;
@@ -21,18 +26,20 @@ body {
 li{
     display: block;
     cursor: pointer;
+    font-family: monospace;
 }
 
-.addPost{
-    width: 520px;
-    margin: 10px auto;
-    background-color: blue;
+
+#addPost{
+    background-color: var(--secondLight);
     border-radius: 15px;
 }
 #newPostBtn{
     width: 100%;
     height: 40px;
-    border-radius: 15px;
+    border-radius: 5px;
+    background-color: var(--mainLight);
+    color: white;
 }
 #newPostForm{
     width: 100%;
@@ -53,21 +60,29 @@ li{
 #sendPost{
     width: 30%;
     height: 30px;
+    border-radius: 5px;
     margin: 10px auto;
+    background-color: var(--mainLight);
 }
 #newPostForm > select{
     width: 80%;
     margin: 10px auto 0 auto;
+    background-color: var(--mainLight);
 }
 
+#filterArea{
+    color: var(--mainBlue);
+}
+#filterArea > select{
+    background-color: var(--mainLight);
+    border-radius: 5px;
+}
 
 .postContainer{
     width: 100vw;
 }
 .post{
-    width: 500px;
-    margin: 10px auto;
-    background-color: blue;
+    background-color: var(--mainBlue);
     padding: 10px;
 }
 .postHead{
@@ -126,6 +141,7 @@ li{
     background-color: aliceblue;
     display: none;
 }
+
 .commentBlock{
     border-bottom: 1px solid gray;
 }
@@ -153,6 +169,11 @@ li{
     width: 500px;
     margin: 10px auto;
 }
+.boldText{
+    font-weight: bold;
+    color: white;
+    font-size: 12pt;
+}
 
 #profileInfo{
     display: flex;
@@ -160,10 +181,55 @@ li{
     border-radius: 15px;
     padding: 10px 0;
     text-align: center;
-    background-color: blue;
+    background-color: var(--mainBlue);
     color: wheat;
 }
 
 .Contacts{
     text-align: center;
 }
+
+.burger-menu {
+    display: none;
+    flex-direction: column;
+    margin: 20px;
+    cursor: pointer;
+}
+.burger-menu .bar {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    margin: 4px 0;
+    transition: 0.3s;
+}
+
+@media only screen and (max-width: 650px) {
+    .centerBlock{
+        width: 80%;
+    }
+    .reactionBtns{
+        width: 90px;
+    }
+    .burger-menu {
+        display: flex;
+    }
+    #headList{
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        background-color: #333;
+    }
+    #headList li {
+        margin: 10px 0;
+        text-align: center;
+    }
+    #headList.active {
+        display: flex;
+    }
+}
+
+
+

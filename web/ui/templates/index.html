@@ -10,6 +10,11 @@
 
 <body>
     <div class="Head">
+        <div class="burger-menu" id="burger-menu" onclick="Burger()">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
         <ul id="headList">
             <li id="homeBtn" data-section="home" onclick="changePage(event)">Forum</li>
             <li id="ProfileBtn" data-section="profile" onclick="changePage(event)">Profile</li>
@@ -18,28 +23,28 @@
     </div>
 
     <div class="homePage" id="homePage">
-        <div class="addPost" id="addPost">
-            <button id = "newPostBtn" onclick="toggleDiv(`newPostForm`)">Create a new post</button>
+        <div class="centerBlock" id="addPost">
+            <button class="boldText" id = "newPostBtn" onclick="toggleDiv(`newPostForm`)">Create a new post</button>
             <div class="newPostArea">
                 <form action=""  autocomplete="off" id="newPostForm">
                     <!-- <div id="errorMessage"></div> -->
                     <input class="input_text" type="text" name="TitlePost" id="TitlePost" placeholder="   Title" maxlength="40" required>
                     <!-- <input type="text" name="contentPost" id="contentPost" placeholder="   Content" maxlength="40" required> -->
                     <textarea name="contentPost" id="contentPost"  placeholder=" Content" maxlength="150" required></textarea>
-                    <select name="selectCategoryPost" id="selectCategoryPost" required>
+                    <select name="selectCategoryPost" id="selectCategoryPost" class="boldText" required>
                         <option value="none" disabled > Select category</option>
                         <option value="Technology"> Technology</option>
                         <option value="Science"> Science</option>
                         <option value="Art"> Art</option>
                     </select>                    
-                    <input type="submit" id="sendPost" value="Send"></input>
+                    <input type="submit" class="boldText" id="sendPost" value="Send"></input>
                 </form>
             </div>
         </div>
 
-        <div class="filterArea centerBlock" id="filterArea">
+        <div class="centerBlock" id="filterArea">
             <b>Apply filter: </b>
-            <select name="selectFilterPost" id="selectFilterPost" onchange="handleSelectChange()">
+            <select name="selectFilterPost" class="boldText" id="selectFilterPost" onchange="handleSelectChange()">
                 <option value="none" disabled > Select Filter</option>
                 <option value="all"> All posts</option>
                 <option value="liked"> by number of likes</option>

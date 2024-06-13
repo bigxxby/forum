@@ -30,7 +30,7 @@ async function createLoginLogout() {
     if (statusLogin == true){
         result.textContent = "Logout";
         result.addEventListener('click',() => {
-            logoutF()
+            logoutFetch()
         });
     } else{
         result.textContent = "Login";
@@ -38,16 +38,24 @@ async function createLoginLogout() {
     }
     document.getElementById('headList').appendChild(result);
 }
-function logoutF(){
-    document.cookie = "uuid" + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=' + window.location.hostname + '; SameSite=None; Secure';
-    
-    // Очистка localStorage и sessionStorage
-    localStorage.clear();
-    sessionStorage.clear();
+function logoutFetch(){
+    // Отправляем запрос на сервер
+        fetch("http://localhost:8080/api/logout", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => {
+            if (!response.ok){
+                throw new Error('Network response was not ok ' + response.statusText);
+            } else{
+                // Перезагружаем страницу
+                window.location.href = "http://localhost:8080/";
+            }
+        })  // Обрабатываем ответ как JSON
 
-    console.log("here")
-    // Пример редиректа на страницу входа после logout
-    // window.location.href = 'http://localhost:8080/';    
+        .catch(error => console.error('Error:', error));  // Обрабатываем возможные ошибки
 }
 
 // Скрывает и показывает див при нажатии
@@ -80,14 +88,14 @@ function handleSelectChange() {
     .catch(error => {
         console.error('Ошибка при получении данных:', error);
     });
-    
+
 
 }
 
 // Функция для создания  постов из ответа сервера
 function createPost(divId,username, id, userId, createdTime, title, content, category, likeCount, dislikeCount, liked, disliked) {
     const postDiv = document.createElement('div');
-    postDiv.classList.add('post');
+    postDiv.classList.add('post', "centerBlock");
     postDiv.id = `post_${id}`;
 
     const postHead = document.createElement('div');
@@ -106,15 +114,15 @@ function createPost(divId,username, id, userId, createdTime, title, content, cat
     const postCategory = document.createElement('i');
     postCategory.textContent = "Category: " + category;
     postDiv.appendChild(postCategory);
-    
+
     const postBottom = createPostBottom(likeCount, dislikeCount, liked,disliked)
     postDiv.appendChild(postBottom);
 
-    
+
     const commentArea = document.createElement('div');
     commentArea.className = 'commentArea';
     postDiv.appendChild(commentArea);
-    
+
     const inputMsg = document.createElement('div');
     inputMsg.className = 'inputMsg';
     inputMsg.innerHTML = `
@@ -138,7 +146,8 @@ function createPostBottom(likeCount, dislikeCount, liked, disliked){
     const dislikeButton = createReactionButton('dislike', dislikeCount, disliked);
     postBottom.appendChild(dislikeButton);
 
-    const commentsButton = createReactionButton('comments', "com", false);
+    const commentsButton = createReactionButton('comments', "...", false);
+    commentsButton.classList.add("commentBtn");
     postBottom.appendChild(commentsButton);
 
     return postBottom
@@ -174,14 +183,14 @@ async function updatePostBottom(id) {
 
     try {
         const response = await fetch(`http://localhost:8080/api/posts/one?valueId=${id}`, {
-           
+
         });
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
         }
-    
+
         const data = await response.json();
-    
+
         postBottom = createPostBottom(data.likes, data.dislikes, data.liked, data.disliked);
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
@@ -202,7 +211,7 @@ document.getElementById('newPostForm').addEventListener('submit', function(event
     const title = document.getElementById('TitlePost').value;
     const content = document.getElementById('contentPost').value;
     const category = document.getElementById('selectCategoryPost').value;
-    
+
     const data = { Title : title, Content : content, Category : category};  // Создаем объект с данными
     const url = 'http://localhost:8080/api/posts';  // URL-адрес сервера
         // Отправляем запрос на сервер
@@ -223,7 +232,7 @@ document.getElementById('newPostForm').addEventListener('submit', function(event
         })  // Обрабатываем ответ как JSON
 
         .catch(error => console.error('Error:', error));  // Обрабатываем возможные ошибки
-    
+
 });
 
 // Обработчик событий для кнопок реакций
@@ -231,7 +240,7 @@ function handleReactionClick(event) {
     const button = event.currentTarget;
     const postDiv = button.closest('.post'); // Найти ближайший элемент с классом 'post'
     const postId = postDiv.id; // Получить id поста
-    
+
     const reactionType = button.dataset.type; // Тип реакции (лайк, дизлайк или комментарии)
     let arr = postId.split('_');
 
@@ -287,7 +296,7 @@ function createCommentArea(id){
     // Создаем Див для коммента и даю класс
     const commentArea = document.createElement('div');
     commentArea.className = 'commentArea';
-    
+
     fetch(`http://localhost:8080/api/comments?valueId=${id}`)
     .then(response => {
         if (!response.ok) {
@@ -307,7 +316,7 @@ function createCommentArea(id){
             commentBlock.innerHTML = `
                 <b>${post.createdBy}</b> </br> <span>${post.content}</span> </br>
             `
-            
+
             commentBlock.appendChild(commentReaction(post.liked, post.likes, "commentLike"))
             commentBlock.appendChild(commentReaction(post.disliked, post.dislikes, "commentDislike"))
             commentArea.appendChild(commentBlock);
@@ -326,6 +335,7 @@ function createCommentArea(id){
     commentArea.style.display = "block";
     post.replaceChild(commentArea, old);
 }
+
 // Отправка комента на сервер
 function sendComment(id){
     const commentInput = document.getElementById(`comment_input_${id}`)
@@ -447,7 +457,6 @@ function homePage(){
     document.getElementById("profilePage").style.display = "none"
     document.getElementById("contactsPage").style.display = "none";
 
-
     fetch('http://localhost:8080/api/posts/all')
     .then(response => {
         if (!response.ok) {
@@ -501,12 +510,11 @@ function ProfilePage(){
         console.error('Ошибка при получении данных:', error);
     });
 }
-
+// При загрузке Contacts
 function contactsPage(){
     document.getElementById("homePage").style.display = "none";
     document.getElementById("profilePage").style.display = "none";
     document.getElementById("contactsBtn").style.fontWeight = "bold";
-
 }
 // Функция которая отправляет ГЕТ запрос на указанный url
 async function fetchJson(url) {
@@ -525,4 +533,8 @@ function changePage(event){
     localStorage.setItem('selectedSection', sectionId);
     // Перезагружаем страницу
     window.location.href = "http://localhost:8080/";
+}
+
+function Burger(){
+    document.getElementById("headList").classList.toggle('active');
 }

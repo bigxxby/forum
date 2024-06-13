@@ -77,3 +77,13 @@ form>input{
     color: white;
     background-color: blue;
 }
+
+
+@media only screen and (max-width: 650px) {
+    .contentArea{
+        width: 80%;
+    }
+    .close{
+        display: none;
+    }
+}
