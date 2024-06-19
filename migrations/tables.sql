@@ -11,14 +11,18 @@ CREATE TABLE IF NOT EXISTS posts (
     user_id INTEGER,
     title TEXT,
     content TEXT,
-    category_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     likes INTEGER DEFAULT 0,
     dislikes INTEGER DEFAULT 0,
-    FOREIGN KEY (category_id) REFERENCES categories(id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS posts_categories (
+    post_id INTEGER,
+    category_id INTEGER,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+);
 CREATE TABLE IF NOT EXISTS categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT UNIQUE NOT NULL,

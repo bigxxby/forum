@@ -1,6 +1,12 @@
 package validation
 
+import "strings"
+
 func IsValidPost(title, content string) bool {
+
+	title = strings.TrimSpace(title)
+	content = strings.TrimSpace(content)
+
 	if len(title) <= 0 || len(title) > 100 {
 		return false
 	}
@@ -8,5 +14,4 @@ func IsValidPost(title, content string) bool {
 		return false
 	}
 	return true
-
 }

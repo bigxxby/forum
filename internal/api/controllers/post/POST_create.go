@@ -28,9 +28,9 @@ func (c *PostController) POST_PostPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := struct {
-		Content  string `json:"content"`
-		Title    string `json:"title"`
-		Category string `json:"category"`
+		Content    string   `json:"content"`
+		Title      string   `json:"title"`
+		Categories []string `json:"categories"`
 	}{}
 
 	body, err := io.ReadAll(r.Body)
@@ -51,9 +51,8 @@ func (c *PostController) POST_PostPost(w http.ResponseWriter, r *http.Request) {
 		httpHelper.Unauthorised(w)
 		return
 	}
-	if data.Content == "" || data.Title == "" || data.Category == "" {
+	if data.Content == "" || data.Title == "" || len(data.Categories) == 0 {
 		httpHelper.BadRequestError(w)
-
 		return
 	}
 	if !validation.IsValidPost(data.Title, data.Content) {
@@ -62,10 +61,14 @@ func (c *PostController) POST_PostPost(w http.ResponseWriter, r *http.Request) {
 	}
 	//VALIDATION
 
-	postId, err := c.PostService.CreatePost(userIdNum, data.Title, data.Content, data.Category)
+	postId, err := c.PostService.CreatePost(userIdNum, data.Title, data.Content, data.Categories)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			httpHelper.NotFoundError(w)
+			return
+		}
+		if err == models.ErrBadRequest {
+			httpHelper.BadRequestError(w)
 			return
 		}
 		log.Println(err.Error())

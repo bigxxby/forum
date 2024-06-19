@@ -5,19 +5,18 @@ INSERT INTO categories (name, posts_count) VALUES
 ('Art', 0);
 
 -- Добавляем посты
-INSERT INTO posts (user_id, title, content, category_id, created_at, likes, dislikes) VALUES
-(1, 'First Post', 'Content of the first post', 1, CURRENT_TIMESTAMP, 5, 2),
-(1, 'Second Post', 'Content of the second post', 2, CURRENT_TIMESTAMP, 10, 1),
-(1, 'Third Post', 'Content of the third post', 3, CURRENT_TIMESTAMP, 3, 0);
+INSERT INTO posts (user_id, title, content, created_at, likes, dislikes) VALUES
+(1, 'First post', 'Content of the first post', CURRENT_TIMESTAMP, 0, 0),
+(1, 'Second post', 'Content of the second post', CURRENT_TIMESTAMP, 0, 0),
+(1, 'Third post', 'Content of the third post', CURRENT_TIMESTAMP, 0, 0);
 
--- Обновляем счетчики постов в категориях
-UPDATE categories SET posts_count = (SELECT COUNT(*) FROM posts WHERE category_id = categories.id);
+-- Добавляем категории для каждого поста
+INSERT INTO posts_categories (post_id, category_id) VALUES
 
--- Добавляем комментарии
-INSERT INTO comments (post_id, user_id, content, created_at, edited, likes, dislikes) VALUES
-(1, 1, 'First comment on first post', CURRENT_TIMESTAMP, FALSE, 2, 0),
-(1, 1, 'Second comment on first post', CURRENT_TIMESTAMP, FALSE, 1, 0),
-(2, 1, 'First comment on second post', CURRENT_TIMESTAMP, FALSE, 0, 1);
+(1, 1), -- Post 1 belongs to category 1
+(1, 2), -- Post 1 belongs to category 2
+(2, 2), -- Post 2 belongs to category 2
+(3, 3); -- Post 3 belongs to category 3
 
 -- Добавляем лайки и дизлайки
 INSERT INTO likes_dislikes (user_id, post_id, comment_id, value) VALUES

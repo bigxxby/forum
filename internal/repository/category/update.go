@@ -1,26 +1,25 @@
 package category
 
-func (repo *CategoryRepository) UPDATE_catCount(catId int) error {
-	// Начать транзакцию
-	tx, err := repo.DB.Begin()
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
 
-	q := `
-		UPDATE categories 
-		SET posts_count = posts_count + 1
-		WHERE id = ?
-	`
-	_, err = tx.Exec(q, catId)
-	if err != nil {
-		return err
+func (repo *CategoryRepository) UPDATE_catCount(catId []int) error {
+	// Convert []int to []string for SQL query
+	var strIds []string
+	for _, id := range catId {
+		strIds = append(strIds, strconv.Itoa(id))
 	}
 
-	err = tx.Commit()
+	// Prepare the SQL query
+	q := `UPDATE categories SET posts_count = posts_count + 1 WHERE id IN (` + strings.Join(strIds, ",") + `)`
+
+	// Execute the query
+	_, err := repo.DB.Exec(q)
 	if err != nil {
-		return err
+		return fmt.Errorf("error updating category count: %w", err)
 	}
 
 	return nil

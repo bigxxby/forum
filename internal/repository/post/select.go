@@ -3,6 +3,7 @@ package post
 import (
 	"database/sql"
 	"forum/internal/models"
+	"strings"
 )
 
 func (repo *PostRepository) SELECT_post(postId, userId int) (*models.Post, bool, bool, error) {
@@ -15,28 +16,38 @@ func (repo *PostRepository) SELECT_post(postId, userId int) (*models.Post, bool,
         p.created_at, 
         u.login,
         p.likes, 
-        c.name,
-        l1.value AS like_value,
-        l2.value AS dislike_value,
+        p.dislikes,
+        COALESCE(GROUP_CONCAT(c.name, ','), '') AS categories,
         CASE WHEN l1.post_id IS NOT NULL THEN true ELSE false END AS liked,
-        CASE WHEN l2.post_id IS NOT NULL THEN true ELSE false END AS disliked,
-		p.dislikes
-		FROM 
+        CASE WHEN l2.post_id IS NOT NULL THEN true ELSE false END AS disliked
+    FROM 
         posts p
     LEFT JOIN 
         users u ON p.user_id = u.id
     LEFT JOIN 
-        categories c ON p.category_id = c.id
+        posts_categories pc ON p.id = pc.post_id
+    LEFT JOIN 
+        categories c ON pc.category_id = c.id
     LEFT JOIN 
         likes_dislikes l1 ON p.id = l1.post_id AND l1.user_id = ? AND l1.value = true
     LEFT JOIN 
         likes_dislikes l2 ON p.id = l2.post_id AND l2.user_id = ? AND l2.value = false
     WHERE 
-        p.id = ?;
+        p.id = ?
+    GROUP BY 
+        p.id, 
+        p.user_id, 
+        p.title, 
+        p.content, 
+        p.created_at, 
+        u.login, 
+        p.likes, 
+        p.dislikes, 
+        l1.post_id, 
+        l2.post_id;
     `
 	var post models.Post
-	var likeValue sql.NullBool
-	var dislikeValue sql.NullBool
+	var categories string
 	var liked bool
 	var disliked bool
 
@@ -48,16 +59,17 @@ func (repo *PostRepository) SELECT_post(postId, userId int) (*models.Post, bool,
 		&post.CreatedAt,
 		&post.CreatedBy,
 		&post.Likes,
-		&post.Category,
-		&likeValue,
-		&dislikeValue,
+		&post.Dislikes,
+		&categories,
 		&liked,
 		&disliked,
-		&post.Dislikes,
 	)
 	if err != nil {
 		return nil, false, false, err
 	}
+
+	// Split the concatenated categories into a slice
+	post.Categories = strings.Split(categories, ",")
 
 	return &post, liked, disliked, nil
 }
@@ -72,8 +84,8 @@ func (repo *PostRepository) SELECT_postsCreatedAt(userId int) ([]models.Post, er
             p.created_at, 
             u.login, 
             p.likes, 
-            c.name,
             p.dislikes,
+            COALESCE(GROUP_CONCAT(c.name, ','), '') AS categories,
             CASE WHEN l1.post_id IS NOT NULL THEN true ELSE false END AS liked,
             CASE WHEN l2.post_id IS NOT NULL THEN true ELSE false END AS disliked
         FROM 
@@ -81,11 +93,15 @@ func (repo *PostRepository) SELECT_postsCreatedAt(userId int) ([]models.Post, er
         LEFT JOIN 
             users u ON p.user_id = u.id
         LEFT JOIN 
-            categories c ON p.category_id = c.id
+            posts_categories pc ON p.id = pc.post_id
+        LEFT JOIN 
+            categories c ON pc.category_id = c.id
         LEFT JOIN 
             likes_dislikes l1 ON p.id = l1.post_id AND l1.user_id = ? AND l1.value = true
         LEFT JOIN 
             likes_dislikes l2 ON p.id = l2.post_id AND l2.user_id = ? AND l2.value = false
+        GROUP BY 
+            p.id, p.user_id, p.title, p.content, p.created_at, u.login, p.likes, p.dislikes
         ORDER BY 
             p.created_at DESC;
     `
@@ -99,8 +115,9 @@ func (repo *PostRepository) SELECT_postsCreatedAt(userId int) ([]models.Post, er
 
 	for rows.Next() {
 		var post models.Post
-		var liked bool
-		var disliked bool
+		var categories string
+		var createdBy sql.NullString
+		var liked, disliked bool
 
 		err := rows.Scan(
 			&post.ID,
@@ -108,15 +125,20 @@ func (repo *PostRepository) SELECT_postsCreatedAt(userId int) ([]models.Post, er
 			&post.Title,
 			&post.Content,
 			&post.CreatedAt,
-			&post.CreatedBy,
+			&createdBy,
 			&post.Likes,
-			&post.Category,
 			&post.Dislikes,
+			&categories,
 			&liked,
 			&disliked,
 		)
 		if err != nil {
 			return nil, err
+		}
+		post.CreatedBy = createdBy.String // Handle NULL-to-string conversion
+		post.Categories = strings.Split(categories, ",")
+		if categories == "" {
+			post.Categories = nil // Handle empty category case
 		}
 		post.Liked = liked
 		post.Disliked = disliked
@@ -124,6 +146,7 @@ func (repo *PostRepository) SELECT_postsCreatedAt(userId int) ([]models.Post, er
 	}
 	return posts, nil
 }
+
 func (repo *PostRepository) SELECT_postsMostLiked(userId int) ([]models.Post, error) {
 	q := `
         SELECT 
@@ -134,8 +157,8 @@ func (repo *PostRepository) SELECT_postsMostLiked(userId int) ([]models.Post, er
             p.created_at, 
             u.login, 
             p.likes, 
-            c.name,
             p.dislikes,
+            COALESCE(GROUP_CONCAT(c.name, ','), '') AS categories,
             CASE WHEN l1.post_id IS NOT NULL THEN true ELSE false END AS liked,
             CASE WHEN l2.post_id IS NOT NULL THEN true ELSE false END AS disliked
         FROM 
@@ -143,11 +166,15 @@ func (repo *PostRepository) SELECT_postsMostLiked(userId int) ([]models.Post, er
         LEFT JOIN 
             users u ON p.user_id = u.id
         LEFT JOIN 
-            categories c ON p.category_id = c.id
+            posts_categories pc ON p.id = pc.post_id
+        LEFT JOIN 
+            categories c ON pc.category_id = c.id
         LEFT JOIN 
             likes_dislikes l1 ON p.id = l1.post_id AND l1.user_id = ? AND l1.value = true
         LEFT JOIN 
             likes_dislikes l2 ON p.id = l2.post_id AND l2.user_id = ? AND l2.value = false
+        GROUP BY 
+            p.id, p.user_id, p.title, p.content, p.created_at, u.login, p.likes, p.dislikes
         ORDER BY 
             p.likes DESC;
     `
@@ -161,8 +188,8 @@ func (repo *PostRepository) SELECT_postsMostLiked(userId int) ([]models.Post, er
 
 	for rows.Next() {
 		var post models.Post
-		var liked bool
-		var disliked bool
+		var categories string
+		var liked, disliked bool
 
 		err := rows.Scan(
 			&post.ID,
@@ -172,13 +199,17 @@ func (repo *PostRepository) SELECT_postsMostLiked(userId int) ([]models.Post, er
 			&post.CreatedAt,
 			&post.CreatedBy,
 			&post.Likes,
-			&post.Category,
 			&post.Dislikes,
+			&categories,
 			&liked,
 			&disliked,
 		)
 		if err != nil {
 			return nil, err
+		}
+		post.Categories = strings.Split(categories, ",")
+		if categories == "" {
+			post.Categories = nil
 		}
 		post.Liked = liked
 		post.Disliked = disliked
@@ -186,6 +217,7 @@ func (repo *PostRepository) SELECT_postsMostLiked(userId int) ([]models.Post, er
 	}
 	return posts, nil
 }
+
 func (repo *PostRepository) SELECT_postsMostDisliked(userId int) ([]models.Post, error) {
 	q := `
         SELECT 
@@ -196,8 +228,8 @@ func (repo *PostRepository) SELECT_postsMostDisliked(userId int) ([]models.Post,
             p.created_at, 
             u.login, 
             p.likes, 
-            c.name,
             p.dislikes,
+            COALESCE(GROUP_CONCAT(c.name, ','), '') AS categories,
             CASE WHEN l1.post_id IS NOT NULL THEN true ELSE false END AS liked,
             CASE WHEN l2.post_id IS NOT NULL THEN true ELSE false END AS disliked
         FROM 
@@ -205,11 +237,15 @@ func (repo *PostRepository) SELECT_postsMostDisliked(userId int) ([]models.Post,
         LEFT JOIN 
             users u ON p.user_id = u.id
         LEFT JOIN 
-            categories c ON p.category_id = c.id
+            posts_categories pc ON p.id = pc.post_id
+        LEFT JOIN 
+            categories c ON pc.category_id = c.id
         LEFT JOIN 
             likes_dislikes l1 ON p.id = l1.post_id AND l1.user_id = ? AND l1.value = true
         LEFT JOIN 
             likes_dislikes l2 ON p.id = l2.post_id AND l2.user_id = ? AND l2.value = false
+        GROUP BY 
+            p.id, p.user_id, p.title, p.content, p.created_at, u.login, p.likes, p.dislikes
         ORDER BY 
             p.dislikes DESC;
     `
@@ -223,8 +259,8 @@ func (repo *PostRepository) SELECT_postsMostDisliked(userId int) ([]models.Post,
 
 	for rows.Next() {
 		var post models.Post
-		var liked bool
-		var disliked bool
+		var categories string
+		var liked, disliked bool
 
 		err := rows.Scan(
 			&post.ID,
@@ -234,13 +270,17 @@ func (repo *PostRepository) SELECT_postsMostDisliked(userId int) ([]models.Post,
 			&post.CreatedAt,
 			&post.CreatedBy,
 			&post.Likes,
-			&post.Category,
 			&post.Dislikes,
+			&categories,
 			&liked,
 			&disliked,
 		)
 		if err != nil {
 			return nil, err
+		}
+		post.Categories = strings.Split(categories, ",")
+		if categories == "" {
+			post.Categories = nil
 		}
 		post.Liked = liked
 		post.Disliked = disliked
@@ -248,6 +288,7 @@ func (repo *PostRepository) SELECT_postsMostDisliked(userId int) ([]models.Post,
 	}
 	return posts, nil
 }
+
 func (repo *PostRepository) SELECT_createdByThisUser(userId int, userIdCreatedBy int) ([]models.Post, error) {
 	q := `
         SELECT 
@@ -258,8 +299,8 @@ func (repo *PostRepository) SELECT_createdByThisUser(userId int, userIdCreatedBy
             p.created_at, 
             u.login, 
             p.likes, 
-            c.name,
             p.dislikes,
+            COALESCE(GROUP_CONCAT(c.name, ','), '') AS categories,
             CASE WHEN l1.post_id IS NOT NULL THEN true ELSE false END AS liked,
             CASE WHEN l2.post_id IS NOT NULL THEN true ELSE false END AS disliked
         FROM 
@@ -267,15 +308,19 @@ func (repo *PostRepository) SELECT_createdByThisUser(userId int, userIdCreatedBy
         LEFT JOIN 
             users u ON p.user_id = u.id
         LEFT JOIN 
-            categories c ON p.category_id = c.id
+            posts_categories pc ON p.id = pc.post_id
+        LEFT JOIN 
+            categories c ON pc.category_id = c.id
         LEFT JOIN 
             likes_dislikes l1 ON p.id = l1.post_id AND l1.user_id = ? AND l1.value = true
         LEFT JOIN 
             likes_dislikes l2 ON p.id = l2.post_id AND l2.user_id = ? AND l2.value = false
-		WHERE p.user_id = ?
+        WHERE 
+            p.user_id = ?
+        GROUP BY 
+            p.id, p.user_id, p.title, p.content, p.created_at, u.login, p.likes, p.dislikes
         ORDER BY 
-            p.created_at DESC
-		;
+            p.created_at DESC;
     `
 	var posts []models.Post
 
@@ -287,8 +332,8 @@ func (repo *PostRepository) SELECT_createdByThisUser(userId int, userIdCreatedBy
 
 	for rows.Next() {
 		var post models.Post
-		var liked bool
-		var disliked bool
+		var categories string
+		var liked, disliked bool
 
 		err := rows.Scan(
 			&post.ID,
@@ -298,13 +343,17 @@ func (repo *PostRepository) SELECT_createdByThisUser(userId int, userIdCreatedBy
 			&post.CreatedAt,
 			&post.CreatedBy,
 			&post.Likes,
-			&post.Category,
 			&post.Dislikes,
+			&categories,
 			&liked,
 			&disliked,
 		)
 		if err != nil {
 			return nil, err
+		}
+		post.Categories = strings.Split(categories, ",")
+		if categories == "" {
+			post.Categories = nil
 		}
 		post.Liked = liked
 		post.Disliked = disliked
@@ -323,22 +372,26 @@ func (repo *PostRepository) SELECT_liked_posts(userId int) ([]models.Post, error
             p.created_at, 
             u.login, 
             p.likes, 
-            c.name,
             p.dislikes,
-            CASE WHEN l1.value IS NOT NULL THEN true ELSE false END AS liked,
-            CASE WHEN l2.value IS NOT NULL THEN true ELSE false END AS disliked
+            COALESCE(GROUP_CONCAT(c.name, ','), '') AS categories,
+            CASE WHEN l1.post_id IS NOT NULL THEN true ELSE false END AS liked,
+            CASE WHEN l2.post_id IS NOT NULL THEN true ELSE false END AS disliked
         FROM 
             posts p
         LEFT JOIN 
             users u ON p.user_id = u.id
         LEFT JOIN 
-            categories c ON p.category_id = c.id
+            posts_categories pc ON p.id = pc.post_id
+        LEFT JOIN 
+            categories c ON pc.category_id = c.id
         LEFT JOIN 
             likes_dislikes l1 ON p.id = l1.post_id AND l1.user_id = ? AND l1.value = true
         LEFT JOIN 
             likes_dislikes l2 ON p.id = l2.post_id AND l2.user_id = ? AND l2.value = false
         WHERE 
             l1.post_id IS NOT NULL
+        GROUP BY 
+            p.id, p.user_id, p.title, p.content, p.created_at, u.login, p.likes, p.dislikes
         ORDER BY 
             l1.id;
     `
@@ -352,8 +405,8 @@ func (repo *PostRepository) SELECT_liked_posts(userId int) ([]models.Post, error
 
 	for rows.Next() {
 		var post models.Post
-		var liked bool
-		var disliked bool
+		var categories string
+		var liked, disliked bool
 
 		err := rows.Scan(
 			&post.ID,
@@ -363,13 +416,17 @@ func (repo *PostRepository) SELECT_liked_posts(userId int) ([]models.Post, error
 			&post.CreatedAt,
 			&post.CreatedBy,
 			&post.Likes,
-			&post.Category,
 			&post.Dislikes,
+			&categories,
 			&liked,
 			&disliked,
 		)
 		if err != nil {
 			return nil, err
+		}
+		post.Categories = strings.Split(categories, ",")
+		if categories == "" {
+			post.Categories = nil
 		}
 		post.Liked = liked
 		post.Disliked = disliked
@@ -377,6 +434,7 @@ func (repo *PostRepository) SELECT_liked_posts(userId int) ([]models.Post, error
 	}
 	return posts, nil
 }
+
 func (repo *PostRepository) SELECT_postsByCategory(userId int, categoryName string) ([]models.Post, error) {
 	q := `
         SELECT 
@@ -387,23 +445,31 @@ func (repo *PostRepository) SELECT_postsByCategory(userId int, categoryName stri
             p.created_at, 
             u.login, 
             p.likes, 
-            c.name,
             p.dislikes,
-            CASE WHEN l1.value IS NOT NULL THEN true ELSE false END AS liked,
-            CASE WHEN l2.value IS NOT NULL THEN true ELSE false END AS disliked
+            COALESCE(GROUP_CONCAT(c2.name, ','), '') AS categories,
+            CASE WHEN l1.post_id IS NOT NULL THEN true ELSE false END AS liked,
+            CASE WHEN l2.post_id IS NOT NULL THEN true ELSE false END AS disliked
         FROM 
             posts p
         LEFT JOIN 
             users u ON p.user_id = u.id
         LEFT JOIN 
-            categories c ON p.category_id = c.id
+            posts_categories pc ON p.id = pc.post_id
+        LEFT JOIN 
+            categories c ON pc.category_id = c.id
+        LEFT JOIN 
+            posts_categories pc2 ON p.id = pc2.post_id
+        LEFT JOIN 
+            categories c2 ON pc2.category_id = c2.id
         LEFT JOIN 
             likes_dislikes l1 ON p.id = l1.post_id AND l1.user_id = ? AND l1.value = true
         LEFT JOIN 
             likes_dislikes l2 ON p.id = l2.post_id AND l2.user_id = ? AND l2.value = false
         WHERE 
-			c.name = ?
-		ORDER BY 
+            c.name = ?
+        GROUP BY 
+            p.id, p.user_id, p.title, p.content, p.created_at, u.login, p.likes, p.dislikes
+        ORDER BY 
             p.created_at;
     `
 	var posts []models.Post
@@ -416,8 +482,8 @@ func (repo *PostRepository) SELECT_postsByCategory(userId int, categoryName stri
 
 	for rows.Next() {
 		var post models.Post
-		var liked bool
-		var disliked bool
+		var categories string
+		var liked, disliked bool
 
 		err := rows.Scan(
 			&post.ID,
@@ -427,13 +493,17 @@ func (repo *PostRepository) SELECT_postsByCategory(userId int, categoryName stri
 			&post.CreatedAt,
 			&post.CreatedBy,
 			&post.Likes,
-			&post.Category,
 			&post.Dislikes,
+			&categories,
 			&liked,
 			&disliked,
 		)
 		if err != nil {
 			return nil, err
+		}
+		post.Categories = strings.Split(categories, ",")
+		if categories == "" {
+			post.Categories = nil
 		}
 		post.Liked = liked
 		post.Disliked = disliked
@@ -441,6 +511,7 @@ func (repo *PostRepository) SELECT_postsByCategory(userId int, categoryName stri
 	}
 	return posts, nil
 }
+
 func (repo *PostRepository) SELECT_postsByMostLiked(userId int, categoryName string) ([]models.Post, error) {
 	q := `
         SELECT 
@@ -451,23 +522,27 @@ func (repo *PostRepository) SELECT_postsByMostLiked(userId int, categoryName str
             p.created_at, 
             u.login, 
             p.likes, 
-            c.name,
             p.dislikes,
-            CASE WHEN l1.value IS NOT NULL THEN true ELSE false END AS liked,
-            CASE WHEN l2.value IS NOT NULL THEN true ELSE false END AS disliked
+            COALESCE(GROUP_CONCAT(c.name, ','), '') AS categories,
+            CASE WHEN l1.post_id IS NOT NULL THEN true ELSE false END AS liked,
+            CASE WHEN l2.post_id IS NOT NULL THEN true ELSE false END AS disliked
         FROM 
             posts p
         LEFT JOIN 
             users u ON p.user_id = u.id
         LEFT JOIN 
-            categories c ON p.category_id = c.id
+            posts_categories pc ON p.id = pc.post_id
+        LEFT JOIN 
+            categories c ON pc.category_id = c.id
         LEFT JOIN 
             likes_dislikes l1 ON p.id = l1.post_id AND l1.user_id = ? AND l1.value = true
         LEFT JOIN 
             likes_dislikes l2 ON p.id = l2.post_id AND l2.user_id = ? AND l2.value = false
         WHERE 
-			c.name = ?
-		ORDER BY 
+            c.name = ?
+        GROUP BY 
+            p.id, p.user_id, p.title, p.content, p.created_at, u.login, p.likes, p.dislikes
+        ORDER BY 
             p.likes DESC;
     `
 	var posts []models.Post
@@ -480,8 +555,8 @@ func (repo *PostRepository) SELECT_postsByMostLiked(userId int, categoryName str
 
 	for rows.Next() {
 		var post models.Post
-		var liked bool
-		var disliked bool
+		var categories string
+		var liked, disliked bool
 
 		err := rows.Scan(
 			&post.ID,
@@ -491,13 +566,17 @@ func (repo *PostRepository) SELECT_postsByMostLiked(userId int, categoryName str
 			&post.CreatedAt,
 			&post.CreatedBy,
 			&post.Likes,
-			&post.Category,
 			&post.Dislikes,
+			&categories,
 			&liked,
 			&disliked,
 		)
 		if err != nil {
 			return nil, err
+		}
+		post.Categories = strings.Split(categories, ",")
+		if categories == "" {
+			post.Categories = nil
 		}
 		post.Liked = liked
 		post.Disliked = disliked
@@ -505,6 +584,7 @@ func (repo *PostRepository) SELECT_postsByMostLiked(userId int, categoryName str
 	}
 	return posts, nil
 }
+
 func (repo *PostRepository) SELECT_postsByMostDisliked(userId int, categoryName string) ([]models.Post, error) {
 	q := `
         SELECT 
@@ -515,23 +595,27 @@ func (repo *PostRepository) SELECT_postsByMostDisliked(userId int, categoryName 
             p.created_at, 
             u.login, 
             p.likes, 
-            c.name,
             p.dislikes,
-            CASE WHEN l1.value IS NOT NULL THEN true ELSE false END AS liked,
-            CASE WHEN l2.value IS NOT NULL THEN true ELSE false END AS disliked
+            COALESCE(GROUP_CONCAT(c.name, ','), '') AS categories,
+            CASE WHEN l1.post_id IS NOT NULL THEN true ELSE false END AS liked,
+            CASE WHEN l2.post_id IS NOT NULL THEN true ELSE false END AS disliked
         FROM 
             posts p
         LEFT JOIN 
             users u ON p.user_id = u.id
         LEFT JOIN 
-            categories c ON p.category_id = c.id
+            posts_categories pc ON p.id = pc.post_id
+        LEFT JOIN 
+            categories c ON pc.category_id = c.id
         LEFT JOIN 
             likes_dislikes l1 ON p.id = l1.post_id AND l1.user_id = ? AND l1.value = true
         LEFT JOIN 
             likes_dislikes l2 ON p.id = l2.post_id AND l2.user_id = ? AND l2.value = false
         WHERE 
-			c.name = ?
-		ORDER BY 
+            c.name = ?
+        GROUP BY 
+            p.id, p.user_id, p.title, p.content, p.created_at, u.login, p.likes, p.dislikes
+        ORDER BY 
             p.dislikes DESC;
     `
 	var posts []models.Post
@@ -544,8 +628,8 @@ func (repo *PostRepository) SELECT_postsByMostDisliked(userId int, categoryName 
 
 	for rows.Next() {
 		var post models.Post
-		var liked bool
-		var disliked bool
+		var categories string
+		var liked, disliked bool
 
 		err := rows.Scan(
 			&post.ID,
@@ -555,13 +639,17 @@ func (repo *PostRepository) SELECT_postsByMostDisliked(userId int, categoryName 
 			&post.CreatedAt,
 			&post.CreatedBy,
 			&post.Likes,
-			&post.Category,
 			&post.Dislikes,
+			&categories,
 			&liked,
 			&disliked,
 		)
 		if err != nil {
 			return nil, err
+		}
+		post.Categories = strings.Split(categories, ",")
+		if categories == "" {
+			post.Categories = nil
 		}
 		post.Liked = liked
 		post.Disliked = disliked

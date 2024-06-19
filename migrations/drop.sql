@@ -3,3 +3,4 @@ DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS likes_dislikes;
+DROP TABLE IF EXISTS posts_categories;

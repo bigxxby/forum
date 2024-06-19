@@ -1,16 +1,21 @@
 package post
 
-func (s *PostService) CreatePost(userId int, title, content string, categoryName string) (int, error) {
-	categoryId, err := s.CategoryRepository.SELECT_categoryByName(categoryName)
+import "forum/internal/models"
+
+func (s *PostService) CreatePost(userId int, title, content string, categories []string) (int, error) {
+	catIds, err := s.CategoryRepository.SELECT_categoriesByName(categories)
 	if err != nil {
 		return -1, err
+	}
+	if len(catIds) != len(categories) {
+		return -1, models.ErrBadRequest
 	}
 
-	postId, err := s.PostRepository.INSERT_post(userId, title, content, categoryId)
+	postId, err := s.PostRepository.INSERT_post(userId, title, content, catIds)
 	if err != nil {
 		return -1, err
 	}
-	err = s.CategoryRepository.UPDATE_catCount(categoryId)
+	err = s.CategoryRepository.UPDATE_catCount(catIds)
 	if err != nil {
 		return -1, err
 	}
