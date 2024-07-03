@@ -69,7 +69,9 @@ li{
     margin: 10px auto 0 auto;
     background-color: var(--mainLight);
 }
-
+.categoriesArea{
+    margin: 20px 0 0 50px;
+}
 #filterArea{
     color: var(--mainBlue);
 }
@@ -84,6 +86,8 @@ li{
 .post{
     background-color: var(--mainBlue);
     padding: 10px;
+    border: 3px solid var(--secondLight);
+    border-radius: 15px;
 }
 .postHead{
     width: 100%;
@@ -109,7 +113,7 @@ li{
     /* Category */
     padding: 0 10px;
     font-weight: bold;
-    background-color: aqua;
+    color: rgb(185, 185, 180);
 }
 .postBottom{
     width: 100%;
@@ -133,7 +137,7 @@ li{
     height: 35px;
 }
 .liked{
-    color: red;
+    color: var(--mainLight);
 }
 
 .commentArea{

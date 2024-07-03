@@ -9,7 +9,6 @@ async function createLoginLogout() {
                 'Content-Type': 'application/json'
             },
         });
-
         if (!response.ok) {
             if (response.status == 401) {
                 statusLogin = false;
@@ -34,10 +33,12 @@ async function createLoginLogout() {
         });
     } else{
         result.textContent = "Login";
-        result.addEventListener('click',() => window.open("http://localhost:8080/signIn"));
+        document.getElementById("newPostBtn").style.display = "none"
+        result.addEventListener('click',() => window.location.href = "http://localhost:8080/signIn");
     }
     document.getElementById('headList').appendChild(result);
 }
+// Отправляет запрос на сервер чтобы сделать логаут
 function logoutFetch(){
     // Отправляем запрос на сервер
         fetch("http://localhost:8080/api/logout", {
@@ -57,13 +58,12 @@ function logoutFetch(){
 
         .catch(error => console.error('Error:', error));  // Обрабатываем возможные ошибки
 }
-
 // Скрывает и показывает див при нажатии
 function toggleDiv(id){
     const div = document.getElementById(id);
     div.style.display = div.style.display == "flex" ? "none" : "flex";
 }
-// При выботе фильтра
+// При выборе фильтра
 function handleSelectChange() {
     const selectElement = document.getElementById('selectFilterPost');
     const selectedValue = selectElement.value;
@@ -82,16 +82,13 @@ function handleSelectChange() {
             throw new Error('Network response was not ok ' + response.statusText);
         }
         result.data.forEach(post => {
-            createPost("postContainer",post.createdBy,post.id, post.userId, post.createdAt, post.title, post.content, post.category, post.likes, post.dislikes, post.liked, post.disliked);
+            createPost("postContainer",post.createdBy,post.id, post.userId, post.createdAt, post.title, post.content, post.categories, post.likes, post.dislikes, post.liked, post.disliked);
         });
     })
     .catch(error => {
         console.error('Ошибка при получении данных:', error);
     });
-
-
 }
-
 // Функция для создания  постов из ответа сервера
 function createPost(divId,username, id, userId, createdTime, title, content, category, likeCount, dislikeCount, liked, disliked) {
     const postDiv = document.createElement('div');
@@ -100,7 +97,7 @@ function createPost(divId,username, id, userId, createdTime, title, content, cat
 
     const postHead = document.createElement('div');
     postHead.className = 'postHead';
-    postHead.innerHTML = `<b onclick= "createdByPosts(${userId})" >${username} </b><br> ${createdTime}`;
+    postHead.innerHTML = `<b onclick= "createdByPosts(${userId})" >${username} </b><br> ${formatDateTime(createdTime)}`;
     postDiv.appendChild(postHead);
 
     const postTitle = document.createElement('h3');
@@ -111,8 +108,15 @@ function createPost(divId,username, id, userId, createdTime, title, content, cat
     postContent.textContent = content;
     postDiv.appendChild(postContent);
 
+    // Здесь через цикл перебираем категории и вставляем в пост
+    // Через тернарный оператор проверяем индекс чтобы вставить точу или запятую.
     const postCategory = document.createElement('i');
-    postCategory.textContent = "Category: " + category;
+    let categories = "Category: ";
+    category.forEach(function(name, index){
+        categories += name 
+        categories += category.length-1===index? "." : ", "
+    })
+    postCategory.textContent = categories;
     postDiv.appendChild(postCategory);
 
     const postBottom = createPostBottom(likeCount, dislikeCount, liked,disliked)
@@ -132,8 +136,6 @@ function createPost(divId,username, id, userId, createdTime, title, content, cat
     postDiv.appendChild(inputMsg);
     document.getElementById(divId).appendChild(postDiv);
 }
-
-
 //создание нижней части поста (лайк дизлайк сообщение)
 // А сами кнопки создаются в другой функции  createReactionButton
 function createPostBottom(likeCount, dislikeCount, liked, disliked){
@@ -152,7 +154,6 @@ function createPostBottom(likeCount, dislikeCount, liked, disliked){
 
     return postBottom
 }
-
 // Тут создаются кнопки с функиями ОНКЛИК
 function createReactionButton(type, count, status) {
     const buttonDiv = document.createElement('div');
@@ -176,11 +177,9 @@ function createReactionButton(type, count, status) {
     buttonDiv.addEventListener('click', handleReactionClick);
     return buttonDiv;
 }
-
 // Функция обновляет количество лайков и дизлайков
 async function updatePostBottom(id) {
     let postBottom;
-
     try {
         const response = await fetch(`http://localhost:8080/api/posts/one?valueId=${id}`, {
 
@@ -203,16 +202,31 @@ async function updatePostBottom(id) {
     // Заменяем второй див на новый див
     post.replaceChild(postBottom, bottom);
 }
-
-
-//Реагирует на нажатие сабмит
+// Форматирует время как мне надо
+function formatDateTime(dateTimeString) {
+    const date = new Date(dateTimeString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}.${month}.${year} ${hours}:${minutes}`;
+}
+//Реагирует на нажатие сабмит при создании нового поста
 document.getElementById('newPostForm').addEventListener('submit', function(event) {
     event.preventDefault();
     const title = document.getElementById('TitlePost').value;
     const content = document.getElementById('contentPost').value;
-    const category = document.getElementById('selectCategoryPost').value;
 
-    const data = { Title : title, Content : content, Category : category};  // Создаем объект с данными
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const checkedCheckboxes = Array.prototype.slice.call(checkboxes).filter(x => x.checked);
+    if (checkedCheckboxes.length === 0) {
+        document.getElementById("selectCategory").style.color = "red";
+        return
+    }
+    const selectedValues = checkedCheckboxes.map(cb => cb.value);
+
+    const data = { Title : title, Content : content, Categories : selectedValues};  // Создаем объект с данными
     const url = 'http://localhost:8080/api/posts';  // URL-адрес сервера
         // Отправляем запрос на сервер
         fetch(url, {
@@ -290,7 +304,6 @@ function handleReactionClick(event) {
     .catch(error => console.error('Ошибка при обновлении реакции:', error));
 }
 
-
 // Место которое будет вставлено коментарии  с сервера
 function createCommentArea(id){
     // Создаем Див для коммента и даю класс
@@ -335,7 +348,6 @@ function createCommentArea(id){
     commentArea.style.display = "block";
     post.replaceChild(commentArea, old);
 }
-
 // Отправка комента на сервер
 function sendComment(id){
     const commentInput = document.getElementById(`comment_input_${id}`)
@@ -409,7 +421,7 @@ function createdByPosts(id){
   })
   .then(data => {
     data.forEach(post => {
-        createPost("postContainer",post.createdBy,post.id, post.userId, post.createdAt, post.title, post.content, post.category, post.likes, post.dislikes, post.liked, post.disliked);
+        createPost("postContainer",post.createdBy,post.id, post.userId, post.createdAt, post.title, post.content, post.categories, post.likes, post.dislikes, post.liked, post.disliked);
 
     });
   })
@@ -429,7 +441,7 @@ function myLikedPosts(id) {
         }
         console.log('Статус ответа:', result.status);
         result.data.forEach(post => {
-            createPost("myPosts",post.createdBy,post.id, post.userId, post.createdAt, post.title, post.content, post.category, post.likes, post.dislikes, post.liked, post.disliked);
+            createPost("myPosts",post.createdBy,post.id, post.userId, post.createdAt, post.title, post.content, post.categories, post.likes, post.dislikes, post.liked, post.disliked);
         });
     })
     .catch(error => {
@@ -466,7 +478,7 @@ function homePage(){
     })
     .then(data => {
         data.forEach(post => {
-            createPost("postContainer",post.createdBy,post.id, post.userId, post.createdAt, post.title, post.content, post.category, post.likes, post.dislikes, post.liked, post.disliked);
+            createPost("postContainer",post.createdBy,post.id, post.userId, post.createdAt, post.title, post.content, post.categories, post.likes, post.dislikes, post.liked, post.disliked);
         });
     })
     .catch(error => {
@@ -503,7 +515,7 @@ function ProfilePage(){
     .then(result => {
         console.log('Статус ответа:', result.status);
         result.data.forEach(post => {
-            createPost("likedPosts",post.createdBy,post.id, post.userId, post.createdAt, post.title, post.content, post.category, post.likes, post.dislikes, post.liked, post.disliked);
+            createPost("likedPosts",post.createdBy,post.id, post.userId, post.createdAt, post.title, post.content, post.categories, post.likes, post.dislikes, post.liked, post.disliked);
         });
     })
     .catch(error => {
