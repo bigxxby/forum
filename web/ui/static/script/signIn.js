@@ -1,3 +1,10 @@
+// При загрузке страницы
+window.addEventListener('load', () => {
+    // Удалить конкретный элемент из localStorage
+    localStorage.removeItem('selectedSection');
+});
+
+
 //Функция который проверяет почту на правописание или на формат
 function validateEmail(email) {
     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -6,7 +13,6 @@ function validateEmail(email) {
     if (!emailPattern.test(email)) {
         errors.push('Please enter a valid email address.');
     }
-
     return errors;
 }
 //Функция который проверяет Пароль

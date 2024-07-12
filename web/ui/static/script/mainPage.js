@@ -101,10 +101,13 @@ function createPost(divId,username, id, userId, createdTime, title, content, cat
     postDiv.appendChild(postHead);
 
     const postTitle = document.createElement('h3');
+    postDiv.classList.add('postText');
     postTitle.textContent = title;
     postDiv.appendChild(postTitle);
 
+    // Чтобы текст не выходил за границу объекта мы разделяем текст через интервал
     const postContent = document.createElement('h4');
+    postContent.classList.add('postText');
     postContent.textContent = content;
     postDiv.appendChild(postContent);
 
@@ -130,12 +133,21 @@ function createPost(divId,username, id, userId, createdTime, title, content, cat
     const inputMsg = document.createElement('div');
     inputMsg.className = 'inputMsg';
     inputMsg.innerHTML = `
-    <textarea class="comment_input" id="comment_input_${id}" placeholder="Введите комментарий"></textarea>
+    <textarea class="comment_input" id="comment_input_${id}" placeholder="Add a comment..."></textarea>
     <button class="submit_comment" onclick="sendComment(${id})">Отправить</button>
     `
     postDiv.appendChild(inputMsg);
     document.getElementById(divId).appendChild(postDiv);
 }
+// Функция разделяет длинную строку на части с определенном интервалом
+function insertSpaces(text, interval) {
+    let result = '';
+    for (let i = 0; i < text.length; i += interval) {
+      result += text.slice(i, i + interval) + ' ';
+    }
+    return result.trim();
+  }
+
 //создание нижней части поста (лайк дизлайк сообщение)
 // А сами кнопки создаются в другой функции  createReactionButton
 function createPostBottom(likeCount, dislikeCount, liked, disliked){
@@ -154,7 +166,7 @@ function createPostBottom(likeCount, dislikeCount, liked, disliked){
 
     return postBottom
 }
-// Тут создаются кнопки с функиями ОНКЛИК
+// Тут создаются кнопки с функиями ОНКЛИК(Like, Dislike, Comment)
 function createReactionButton(type, count, status) {
     const buttonDiv = document.createElement('div');
     buttonDiv.className = 'reactionBtns';
@@ -326,8 +338,21 @@ function createCommentArea(id){
             const commentBlock = document.createElement('div');
             commentBlock.className = 'commentBlock';
             commentBlock.id = `comment_${post.id}`
+
+            let commentTxt = ""
+            let commentArray = post.content.split(' ');; // Преобразуем строку в массив
+            commentArray.forEach(function(text, Index){
+                if (text.length > 25){
+                    commentTxt += insertSpaces(text, 25);
+                } else {
+                    commentTxt += text;
+                }
+                if (Index != commentArray.length-1){
+                    commentTxt += " "
+                }
+            })
             commentBlock.innerHTML = `
-                <b>${post.createdBy}</b> </br> <span>${post.content}</span> </br>
+                <b>${post.createdBy}</b> </br> <span>${commentTxt}</span> </br>
             `
 
             commentBlock.appendChild(commentReaction(post.liked, post.likes, "commentLike"))
@@ -366,7 +391,11 @@ function sendComment(id){
         })
         .then(response => {
             if (!response.ok){
-                throw new Error('Network response was not ok ' + response.statusText);
+                if (response.status === 401){
+                    alert("Only registred users can leave a comment")
+                } else {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
             } else{
                 createCommentArea(id)
             }

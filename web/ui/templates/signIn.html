@@ -12,7 +12,6 @@
     <div class="Head">
         <ul>
             <li onclick="window.location.href = 'http://localhost:8080/'">Forum</li>
-            <li class="close">Contacts</li>
         </ul>
     </div>
 
@@ -22,7 +21,7 @@
         </div>
         <div class="content">
             <form action="" method="post" autocomplete="off" id="signInForm">
-                <div id="errorMessage"></div>
+                <div id="errorMessage" class="errorMessage"></div>
                 <input class="input_text" type="text" name="email" id="email" placeholder="   Email" maxlength="30" required>
                 <input type="password" name="password" id="password" placeholder="   Password" maxlength="20" required>
                 <input type="submit" id="submitBtn" value="SUBMIT"></input>

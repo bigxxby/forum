@@ -1,3 +1,8 @@
+// При загрузке страницы
+window.addEventListener('load', () => {
+    // Удалить конкретный элемент из localStorage
+    localStorage.removeItem('selectedSection');
+});
 
 //Функция который проверяет логин
 function validateUsername(username) {
@@ -88,7 +93,7 @@ function validateConfirmPassword(password, confirmPassword) {
 //Реагирует на заполнение логина
 document.getElementById('username').addEventListener('input', function() {
     const username = this.value;
-    const usernameError = document.getElementById('errorMessage');
+    const usernameError = document.getElementById('errorUsername');
     const errors = validateUsername(username);
 
     if (errors.length > 0) {
@@ -102,7 +107,7 @@ document.getElementById('username').addEventListener('input', function() {
 
 document.getElementById('email').addEventListener('input', function() {
     const email = this.value;
-    const emailError = document.getElementById('errorMessage');
+    const emailError = document.getElementById('errorEmail');
     const errors = validateEmail(email);
 
     if (errors.length > 0) {
@@ -116,7 +121,7 @@ document.getElementById('email').addEventListener('input', function() {
 
 document.getElementById('password').addEventListener('input', function() {
     const password = this.value;
-    const passwordError = document.getElementById('errorMessage');
+    const passwordError = document.getElementById('errorPassword');
     const errors = validatePassword(password);
 
     if (errors.length > 0) {
@@ -131,7 +136,7 @@ document.getElementById('password').addEventListener('input', function() {
 document.getElementById('confirmPassword').addEventListener('input', function() {
     const confirmPassword = this.value;
     const password = document.getElementById('password').value;
-    const confirmPasswordError = document.getElementById('errorMessage');
+    const confirmPasswordError = document.getElementById('errorRePassword');
     const errors = validateConfirmPassword(password, confirmPassword);
 
     if (errors.length > 0) {

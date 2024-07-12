@@ -12,7 +12,6 @@
     <div class="Head">
         <ul>
             <li onclick="window.location.href = 'http://localhost:8080/'">Forum</li>
-            <li class="close">Contacts</li>
         </ul>
     </div>
 
@@ -22,11 +21,14 @@
         </div>
         <div class="content">
             <form action="" method="post" autocomplete="off" id="authorizationForm">
-                <div id="errorMessage"></div>
                 <input class="input_text" type="text" name="username" , id="username" placeholder="   Username" maxlength="20" required>
+                <div id="errorUsername" class="errorMessage"></div>
                 <input class="input_text" type="password" name="password" id="password" placeholder="   Password" maxlength="20" required>
+                <div id="errorPassword" class="errorMessage"></div>
                 <input class="input_text" type="password" name="repass" id="confirmPassword" placeholder="   Repeat password" maxlength="20" required>
+                <div id="errorRePassword" class="errorMessage"></div>
                 <input class="input_text" type="text" name="email" id="email" placeholder="   Email" maxlength="30" required>
+                <div id="errorEmail" class="errorMessage"></div>
                 <input class="input_text" type="submit" id="submitBtn" value="SUBMIT"></input>
                 <a id="direct" href="http://localhost:8080/signIn">I have account</a>
             </form>
@@ -34,6 +36,7 @@
             <div id="succesPage">
                 <h3>Registration completed successfully.</h3>
                 <button onclick='window.location.href ="http://localhost:8080/signIn"'>Go to login page</button>
+                <h1>  </h1>
             </div>
         </div>
     </div>

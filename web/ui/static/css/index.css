@@ -115,6 +115,9 @@ li{
     font-weight: bold;
     color: rgb(185, 185, 180);
 }
+.postText{
+    word-break: break-word;    /* Перенос длинных слов */
+}
 .postBottom{
     width: 100%;
     height: 50px;
@@ -234,6 +237,3 @@ li{
         display: flex;
     }
 }
-
-
-
